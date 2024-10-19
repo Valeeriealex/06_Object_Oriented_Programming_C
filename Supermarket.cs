@@ -81,7 +81,7 @@ namespace Tasks_IJunior_02._06_OOP
 
         private void PrintListProductsSale()
         {
-            Console.WriteLine("Все товары в магазине: "); 
+            Console.WriteLine("Все товары в магазине: ");
 
             for (int i = 0; i < _listProductsSale.Count; i++)
             {
@@ -125,9 +125,12 @@ namespace Tasks_IJunior_02._06_OOP
 
         private void CreateClientsForMarket()
         {
-            _queueClients.Enqueue(new Client(1000));
-            _queueClients.Enqueue(new Client(300));
-            _queueClients.Enqueue(new Client(150));
+            List<int> clientsMoney = new List<int> { 1000, 300, 150 };
+
+            foreach (int money in clientsMoney)
+            {
+                _queueClients.Enqueue(new Client(money));
+            }
         }
 
         private void TransferProduct(Client client)
@@ -142,17 +145,15 @@ namespace Tasks_IJunior_02._06_OOP
             Console.WriteLine("\nМАГАЗИН: Название товара? ");
             Console.Write("ПОКУПАТЕЛЬ: ");
             string productSell = Console.ReadLine();
-            Product product;
 
-            if (TryGetProduct(productSell, out product, ListProductsSale))
+            Product product = TryGetProduct(productSell, ListProductsSale);
+
+            if (product != null)
             {
                 client.Basket.Add(product);
                 Console.WriteLine($"Покупатель положил в корзину: {product.Name}");
 
-                int totalCost = 0;
-
-                IncreaseCost(client, ref totalCost);
-
+                int totalCost = IncreaseCost(client);
                 Console.WriteLine($"Общая сумма: {totalCost}");
             }
 
@@ -185,9 +186,7 @@ namespace Tasks_IJunior_02._06_OOP
 
         private void PutProductInBag(Client client)
         {
-            int totalCost = 0;
-
-            totalCost = IncreaseCost(client, ref totalCost);
+            int totalCost = IncreaseCost(client);
 
             while (client.Money < totalCost)
             {
@@ -207,9 +206,7 @@ namespace Tasks_IJunior_02._06_OOP
                     Console.WriteLine($"Покупатель убрал из корзины {productToRemove.Name}");
                 }
 
-                totalCost = 0;
-
-                totalCost = IncreaseCost(client, ref totalCost);
+                totalCost = IncreaseCost(client);
 
                 Console.WriteLine($"Общая сумма: {totalCost}");
             }
@@ -227,33 +224,32 @@ namespace Tasks_IJunior_02._06_OOP
             }
         }
 
-        private bool TryGetProduct(string productName, out Product product, List<Product> products)
+        private Product TryGetProduct(string productName, List<Product> products)
         {
-            product = null;
-
             if (products.Count > 0)
             {
                 foreach (Product element in products)
                 {
                     if (element.Name.ToLower() == productName.ToLower())
                     {
-                        product = element;
-                        return true;
+                        return element;
                     }
                 }
 
                 Console.WriteLine("\nМАГАЗИН: Данного товара нет\n");
-                return false;
+                return null;
             }
             else
             {
                 Console.WriteLine("\nМАГАЗИН: Закончились все товары\n");
-                return false;
+                return null;
             }
         }
 
-        private int IncreaseCost(Client client, ref int totalCost)
+        private int IncreaseCost(Client client)
         {
+            int totalCost = 0;
+
             foreach (Product clientProduct in client.Basket)
             {
                 totalCost += clientProduct.Price;
