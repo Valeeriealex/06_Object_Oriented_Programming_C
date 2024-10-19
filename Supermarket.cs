@@ -200,14 +200,14 @@ namespace Tasks_IJunior_02._06_OOP
                 Console.Write("ПОКУПАТЕЛЬ: ");
                 string productDell = Console.ReadLine();
 
-                if (TryGetProduct(productDell, out Product productToRemove, client.Basket))
-                {
-                    client.Basket.Remove(productToRemove);
-                    Console.WriteLine($"Покупатель убрал из корзины {productToRemove.Name}");
-                }
-
-                totalCost = IncreaseCost(client);
-
+                 Product product = TryGetProduct(productDell, client.Basket);
+                 
+                if (product != null)
+            {
+                client.Basket.Remove(productToRemove);
+                Console.WriteLine($"Покупатель убрал из корзины {productToRemove.Name}");
+                
+                int totalCost = IncreaseCost(client);
                 Console.WriteLine($"Общая сумма: {totalCost}");
             }
 
