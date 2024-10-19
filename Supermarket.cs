@@ -74,7 +74,7 @@ namespace Tasks_IJunior_02._06_OOP
 
         private void ShowInfo()
         {
-            Console.WriteLine($"МАГАЗИН: Заработанные деньги: {Money} руб.");
+            Console.WriteLine($"\nМАГАЗИН: Заработанные деньги: {Money} руб.");
             PrintListProductsSale();
             PrintQueueClients();
         }
