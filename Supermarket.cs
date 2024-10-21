@@ -6,7 +6,7 @@ namespace Tasks_IJunior_02._06_OOP
 {
     internal class Supermarket
     {
-        static void Main(string[] args)
+        public static void Main(string[] args)
         {
             Market supermarket = new Market();
             supermarket.Work();
@@ -72,6 +72,7 @@ namespace Tasks_IJunior_02._06_OOP
             Console.WriteLine("МАГАЗИН: Нет покупателей в очереди");
         }
 
+
         private void ShowInfo()
         {
             Console.WriteLine($"\nМАГАЗИН: Заработанные деньги: {Money} руб.");
@@ -132,8 +133,7 @@ namespace Tasks_IJunior_02._06_OOP
                 _queueClients.Enqueue(new Client(money));
             }
         }
-
-        private void TransferProduct(Client client)
+private void TransferProduct(Client client)
         {
             PutProductInBasket(client);
             Console.WriteLine("ПОКУПАТЕЛЬ: ");
@@ -204,8 +204,8 @@ namespace Tasks_IJunior_02._06_OOP
                  
                 if (product != null)
             {
-                client.Basket.Remove(productToRemove);
-                Console.WriteLine($"Покупатель убрал из корзины {productToRemove.Name}");
+                client.Basket.Remove(product);
+                Console.WriteLine($"Покупатель убрал из корзины {product.Name}");
                 
                 int totalCost = IncreaseCost(client);
                 Console.WriteLine($"Общая сумма: {totalCost}");
@@ -222,6 +222,7 @@ namespace Tasks_IJunior_02._06_OOP
 
                 client.Basket.Clear();
             }
+        }
         }
 
         private Product TryGetProduct(string productName, List<Product> products)
@@ -245,64 +246,43 @@ namespace Tasks_IJunior_02._06_OOP
                 return null;
             }
         }
-
-        private int IncreaseCost(Client client)
-        {
-            int totalCost = 0;
-
-            foreach (Product clientProduct in client.Basket)
-            {
-                totalCost += clientProduct.Price;
-            }
-
-            return totalCost;
-        }
-    }
-
-    public class Client
+        public class Client
     {
         private List<Product> _basket = new List<Product>();
         private List<Product> _bag = new List<Product>();
+        private int _money;
 
-        public Client(int _money)
+        public Client(int money)
         {
-            Money = _money;
-            Basket = _basket;
-            Bag = _bag;
+            _money = money;
+            Money = money;
         }
 
         public int Money { get; private set; }
-        public List<Product> Basket { get; private set; }
-        public List<Product> Bag { get; private set; }
-
+        public List<Product> Basket = new List<Product>( _basket);
+        public List<Product> Bag = new List<Product>(_bag);
+        
         public void ShowInfo()
         {
             Console.WriteLine($"Кошелек: {Money}");
             Console.WriteLine($"Корзина: ");
-            PrintListProductsInBasket();
+            PrintListProducts(Basket);
             Console.WriteLine($"Сумка: ");
-            PrintListProductsInBag();
+            PrintListProducts(Bag);
         }
 
-        private void PrintListProductsInBasket()
+        private void PrintListProducts(List<Product> products)
         {
-            for (int i = 0; i < _basket.Count; i++)
+            for (int i = 0; i <  products.Count; i++)
             {
-                _basket[i].ShowInfo();
+                 products[i].ShowInfo();
             }
         }
 
-        private void PrintListProductsInBag()
+        private void SpendMoney(int amount)
         {
-            for (int i = 0; i < _bag.Count; i++)
-            {
-                _bag[i].ShowInfo();
-            }
-        }
-
-        public void SpendMoney(int amount)
-        {
-            Money -= amount;
+            _money -= amount;
+            Money = _money;
         }
     }
 
@@ -324,4 +304,19 @@ namespace Tasks_IJunior_02._06_OOP
             Console.WriteLine($"Товар: {Name}, Производитель: {Brand}, Стоимость: {Price}");
         }
     }
+    }
+
+        private int IncreaseCost(Client client)
+        {
+            int totalCost = 0;
+
+            foreach (Product clientProduct in client.Basket)
+            {
+                totalCost += clientProduct.Price;
+            }
+
+            return totalCost;
+        }
+    }
+}
 }
