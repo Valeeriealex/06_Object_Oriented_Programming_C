@@ -246,6 +246,7 @@ private void TransferProduct(Client client)
                 return null;
             }
         }
+    }
         public class Client
     {
         private List<Product> _basket = new List<Product>();
@@ -303,8 +304,6 @@ private void TransferProduct(Client client)
         {
             Console.WriteLine($"Товар: {Name}, Производитель: {Brand}, Стоимость: {Price}");
         }
-    }
-    }
 
         private int IncreaseCost(Client client)
         {
@@ -318,5 +317,4 @@ private void TransferProduct(Client client)
             return totalCost;
         }
     }
-}
 }
