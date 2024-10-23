@@ -19,17 +19,6 @@ namespace Tasks_IJunior_02._06_OOP
         private List<Product> _listProductsSale = new List<Product>();
         private Queue<Client> _queueClients = new Queue<Client>();
 
-        public Market()
-        {
-            Money = _money;
-            ListProductsSale = _listProductsSale;
-            QueueClients = _queueClients;
-        }
-
-        public int Money { get; private set; }
-        public List<Product> ListProductsSale { get; private set; }
-        public Queue<Client> QueueClients { get; private set; }
-
         public void Work()
         {
             const string CommandBuyProduct = "1";
@@ -72,10 +61,9 @@ namespace Tasks_IJunior_02._06_OOP
             Console.WriteLine("МАГАЗИН: Нет покупателей в очереди");
         }
 
-
         private void ShowInfo()
         {
-            Console.WriteLine($"\nМАГАЗИН: Заработанные деньги: {Money} руб.");
+            Console.WriteLine($"\nМАГАЗИН: Заработанные деньги: {_money} руб.");
             PrintListProductsSale();
             PrintQueueClients();
         }
@@ -112,7 +100,7 @@ namespace Tasks_IJunior_02._06_OOP
 
         private void ShowError()
         {
-            Console.WriteLine("\nОшибка: Неккоректный ввод\n");
+            Console.WriteLine("\nОШИБКА: Неккоректный ввод\n");
         }
 
         private void CreateProductsForMarket()
@@ -133,7 +121,8 @@ namespace Tasks_IJunior_02._06_OOP
                 _queueClients.Enqueue(new Client(money));
             }
         }
-private void TransferProduct(Client client)
+
+        private void TransferProduct(Client client)
         {
             PutProductInBasket(client);
             Console.WriteLine("ПОКУПАТЕЛЬ: ");
@@ -146,7 +135,7 @@ private void TransferProduct(Client client)
             Console.Write("ПОКУПАТЕЛЬ: ");
             string productSell = Console.ReadLine();
 
-            Product product = TryGetProduct(productSell, ListProductsSale);
+            Product product = TryGetProduct(productSell, _listProductsSale);
 
             if (product != null)
             {
@@ -200,29 +189,35 @@ private void TransferProduct(Client client)
                 Console.Write("ПОКУПАТЕЛЬ: ");
                 string productDell = Console.ReadLine();
 
-                 Product product = TryGetProduct(productDell, client.Basket);
-                 
-                if (product != null)
-            {
-                client.Basket.Remove(product);
-                Console.WriteLine($"Покупатель убрал из корзины {product.Name}");
-                
-                int totalCost = IncreaseCost(client);
-                Console.WriteLine($"Общая сумма: {totalCost}");
-            }
+                Product product = TryGetProduct(productDell, client.Basket);
 
-            if (client.Money >= totalCost)
-            {
-                foreach (Product product in client.Basket)
+                if (product != null)
                 {
-                    client.Bag.Add(product);
-                    client.SpendMoney(product.Price);
-                    Money += product.Price;
+                    client.Basket.Remove(product);
+                    Console.WriteLine($"Покупатель убрал из корзины {product.Name}");
+
+                    totalCost = IncreaseCost(client);
+                    Console.WriteLine($"Общая сумма: {totalCost}");
                 }
 
-                client.Basket.Clear();
+                if (client.Money >= totalCost)
+                {
+                    foreach (Product productClient in client.Basket)
+                    {
+                        if (client.SpendMoney(productClient.Price))
+                        {
+                            client.Bag.Add(productClient);
+                            _money += productClient.Price;
+                        }
+                        else
+                        {
+                            Console.WriteLine("У клиента не хватает денег для покупки");
+                        }
+                    }
+
+                    client.Basket.Clear();
+                }
             }
-        }
         }
 
         private Product TryGetProduct(string productName, List<Product> products)
@@ -246,8 +241,21 @@ private void TransferProduct(Client client)
                 return null;
             }
         }
+
+        private int IncreaseCost(Client client)
+        {
+            int totalCost = 0;
+
+            foreach (Product clientProduct in client.Basket)
+            {
+                totalCost += clientProduct.Price;
+            }
+
+            return totalCost;
+        }
     }
-        public class Client
+
+    public class Client
     {
         private List<Product> _basket = new List<Product>();
         private List<Product> _bag = new List<Product>();
@@ -260,9 +268,9 @@ private void TransferProduct(Client client)
         }
 
         public int Money { get; private set; }
-        public List<Product> Basket = new List<Product>( _basket);
+        public List<Product> Basket = new List<Product>(_basket);
         public List<Product> Bag = new List<Product>(_bag);
-        
+
         public void ShowInfo()
         {
             Console.WriteLine($"Кошелек: {Money}");
@@ -274,16 +282,24 @@ private void TransferProduct(Client client)
 
         private void PrintListProducts(List<Product> products)
         {
-            for (int i = 0; i <  products.Count; i++)
+            for (int i = 0; i < products.Count; i++)
             {
-                 products[i].ShowInfo();
+                products[i].ShowInfo();
             }
         }
 
-        private void SpendMoney(int amount)
+        public bool SpendMoney(int amount)
         {
-            _money -= amount;
-            Money = _money;
+            if (_money >= amount)
+            {
+                _money -= amount;
+                Money = _money;
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
     }
 
@@ -303,18 +319,6 @@ private void TransferProduct(Client client)
         public void ShowInfo()
         {
             Console.WriteLine($"Товар: {Name}, Производитель: {Brand}, Стоимость: {Price}");
-        }
-
-        private int IncreaseCost(Client client)
-        {
-            int totalCost = 0;
-
-            foreach (Product clientProduct in client.Basket)
-            {
-                totalCost += clientProduct.Price;
-            }
-
-            return totalCost;
         }
     }
 }
