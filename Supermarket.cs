@@ -4,7 +4,7 @@ using static Tasks_IJunior_02._06_OOP.Market;
 
 namespace Tasks_IJunior_02._06_OOP
 {
-    internal class Supermarket
+    internal class ProductMarker
     {
         public static void Main(string[] args)
         {
@@ -38,7 +38,7 @@ namespace Tasks_IJunior_02._06_OOP
                 {
                     Console.WriteLine($"\nМАГАЗИН: Покупатель с балансом {client.Money} руб.");
                     Console.WriteLine("\nМАГАЗИН: Желаете преобрести какой-то товар?");
-                    Console.WriteLine($"ПОКУПАТЕЛЬ: \n{CommandBuyProduct} - Да, желаю купить товар\n{CommandExit} - Нет, я ухожу ");
+                    Console.WriteLine($"ПОКУПАТЕЛЬ: {CommandBuyProduct} - Да, желаю купить товар {CommandExit} - Нет, я ухожу ");
                     Console.Write("ПОКУПАТЕЛЬ: ");
 
                     switch (Console.ReadLine())
@@ -58,7 +58,7 @@ namespace Tasks_IJunior_02._06_OOP
                 }
             }
 
-            Console.WriteLine("МАГАЗИН: Нет покупателей в очереди");
+            Console.WriteLine("\nМАГАЗИН: Нет покупателей в очереди");
         }
 
         private void ShowInfo()
@@ -70,7 +70,7 @@ namespace Tasks_IJunior_02._06_OOP
 
         private void PrintListProductsSale()
         {
-            Console.WriteLine("Все товары в магазине: ");
+            Console.WriteLine("\nМАГАЗИН: Все товары: \n");
 
             for (int i = 0; i < _listProductsSale.Count; i++)
             {
@@ -80,12 +80,12 @@ namespace Tasks_IJunior_02._06_OOP
 
         private void PrintQueueClients()
         {
-            Console.WriteLine("Покупатели в очереди: ");
+            Console.WriteLine("\nМАГАЗИН: Покупатели в очереди: ");
             int countClient = 1;
 
             foreach (Client client in _queueClients.ToArray())
             {
-                Console.WriteLine($"Покупатель {countClient}: ");
+                Console.WriteLine($"\nПокупатель {countClient}: ");
                 client.ShowInfo();
                 countClient++;
             }
@@ -140,7 +140,7 @@ namespace Tasks_IJunior_02._06_OOP
             if (product != null)
             {
                 client.Basket.Add(product);
-                Console.WriteLine($"Покупатель положил в корзину: {product.Name}");
+                Console.WriteLine($"\nПОКУПАТЕЛЬ: Положил в корзину: {product.Name}");
 
                 int totalCost = IncreaseCost(client);
                 Console.WriteLine($"Общая сумма: {totalCost}");
@@ -155,7 +155,7 @@ namespace Tasks_IJunior_02._06_OOP
             const string CommandBuy = "2";
 
             PrintListProductsSale();
-            Console.WriteLine($"МАГАЗИН: {CommandPutProductInBasket} - выбрать еще какой-то товар {CommandBuy} - купить то, что в корзине?");
+            Console.WriteLine($"\nМАГАЗИН: {CommandPutProductInBasket} - выбрать еще какой-то товар {CommandBuy} - купить то, что в корзине?");
             Console.Write("ПОКУПАТЕЛЬ: ");
             string clientChose = Console.ReadLine();
 
@@ -179,13 +179,8 @@ namespace Tasks_IJunior_02._06_OOP
 
             while (client.Money < totalCost)
             {
-                if (client.Basket.Count == 0)
-                {
-                    Console.WriteLine("\nКорзина пуста");
-                    break;
-                }
-
-                Console.WriteLine($"\nМАГАЗИН: Покупателю не хватает денег купить выбранные продукты\nНазвание товара, который убрать: ");
+                Console.WriteLine($"\nМАГАЗИН: Покупателю не хватает денег для покупки. Общая сумма: {totalCost} руб.");
+                Console.WriteLine("Введите название товара, который хотите убрать из корзины: ");
                 Console.Write("ПОКУПАТЕЛЬ: ");
                 string productDell = Console.ReadLine();
 
@@ -194,33 +189,37 @@ namespace Tasks_IJunior_02._06_OOP
                 if (product != null)
                 {
                     client.Basket.Remove(product);
-                    Console.WriteLine($"Покупатель убрал из корзины {product.Name}");
+                    Console.WriteLine($"\nПОКУПАТЕЛЬ: Убрал из корзины {product.Name}");
 
-                    totalCost = IncreaseCost(client);
-                    Console.WriteLine($"Общая сумма: {totalCost}");
+                    totalCost = IncreaseCost(client); 
                 }
+            }
 
-                if (client.Money >= totalCost)
+            if (client.Money >= totalCost)
+            {
+                foreach (Product productClient in client.Basket.ToList()) 
                 {
-                    foreach (Product productClient in client.Basket)
+                    if (client.SpendMoney(productClient.Price))
                     {
-                        if (client.SpendMoney(productClient.Price))
-                        {
-                            client.Bag.Add(productClient);
-                            _money += productClient.Price;
-                        }
-                        else
-                        {
-                            Console.WriteLine("У клиента не хватает денег для покупки");
-                        }
+                        client.Bag.Add(productClient);
+                        _money += productClient.Price;
                     }
-
-                    client.Basket.Clear();
+                    else
+                    {
+                        Console.WriteLine("\nПОКУПАТЕЛЬ: Не хватает денег для покупки");
+                    }
                 }
+
+                client.Basket.Clear();
+                Console.WriteLine("\nМАГАЗИН: Спасибо за покупку!");
+            }
+            else
+            {
+                Console.WriteLine("\nПОКУПАТЕЛЬ: Не хватает денег для покупки");
             }
         }
 
-        private Product TryGetProduct(string productName, List<Product> products)
+        private Product TryGetProduct(string productName, List<Product> products) 
         {
             if (products.Count > 0)
             {
@@ -232,12 +231,12 @@ namespace Tasks_IJunior_02._06_OOP
                     }
                 }
 
-                Console.WriteLine("\nМАГАЗИН: Данного товара нет\n");
+                Console.WriteLine("\nМАГАЗИН: Данного товара нет");
                 return null;
             }
             else
             {
-                Console.WriteLine("\nМАГАЗИН: Закончились все товары\n");
+                Console.WriteLine("\nМАГАЗИН: Закончились все товары");
                 return null;
             }
         }
@@ -268,8 +267,8 @@ namespace Tasks_IJunior_02._06_OOP
         }
 
         public int Money { get; private set; }
-        public List<Product> Basket = new List<Product>(_basket);
-        public List<Product> Bag = new List<Product>(_bag);
+        public List<Product> Basket => new List<Product>(_basket);
+        public List<Product> Bag => new List<Product>(_bag);
 
         public void ShowInfo()
         {
@@ -322,3 +321,4 @@ namespace Tasks_IJunior_02._06_OOP
         }
     }
 }
+
