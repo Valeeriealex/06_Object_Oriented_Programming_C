@@ -139,7 +139,7 @@ namespace Tasks_IJunior_02._06_OOP
 
             if (product != null)
             {
-                client.Basket.Add(product);
+                client.AddProductInBasket(product);
                 Console.WriteLine($"\nПОКУПАТЕЛЬ: Положил в корзину: {product.Name}");
 
                 int totalCost = IncreaseCost(client);
@@ -153,9 +153,11 @@ namespace Tasks_IJunior_02._06_OOP
         {
             const string CommandPutProductInBasket = "1";
             const string CommandBuy = "2";
+            const string CommandRemove = "3";
 
+            client.ShowInfo();
             PrintListProductsSale();
-            Console.WriteLine($"\nМАГАЗИН: {CommandPutProductInBasket} - выбрать еще какой-то товар {CommandBuy} - купить то, что в корзине?");
+            Console.WriteLine($"\nМАГАЗИН: {CommandPutProductInBasket} - выбрать еще какой-то товар {CommandBuy} - купить то, что в корзине {CommandRemove} - удалить какой-то товар?");
             Console.Write("ПОКУПАТЕЛЬ: ");
             string clientChose = Console.ReadLine();
 
@@ -166,6 +168,9 @@ namespace Tasks_IJunior_02._06_OOP
                     break;
                 case CommandBuy:
                     PutProductInBag(client);
+                    break;
+                case CommandRemove:
+                    DelFromBag(client);
                     break;
                 default:
                     ShowError();
@@ -180,28 +185,17 @@ namespace Tasks_IJunior_02._06_OOP
             while (client.Money < totalCost)
             {
                 Console.WriteLine($"\nМАГАЗИН: Покупателю не хватает денег для покупки. Общая сумма: {totalCost} руб.");
-                Console.WriteLine("Введите название товара, который хотите убрать из корзины: ");
-                Console.Write("ПОКУПАТЕЛЬ: ");
-                string productDell = Console.ReadLine();
-
-                Product product = TryGetProduct(productDell, client.Basket);
-
-                if (product != null)
-                {
-                    client.Basket.Remove(product);
-                    Console.WriteLine($"\nПОКУПАТЕЛЬ: Убрал из корзины {product.Name}");
-
-                    totalCost = IncreaseCost(client); 
-                }
+                DelFromBag(client);
+                totalCost = IncreaseCost(client);
             }
 
             if (client.Money >= totalCost)
             {
-                foreach (Product productClient in client.Basket.ToList()) 
+                foreach (Product productClient in client.Basket)
                 {
                     if (client.SpendMoney(productClient.Price))
                     {
-                        client.Bag.Add(productClient);
+                        client.AddProductInBag(productClient);
                         _money += productClient.Price;
                     }
                     else
@@ -210,7 +204,7 @@ namespace Tasks_IJunior_02._06_OOP
                     }
                 }
 
-                client.Basket.Clear();
+                client.ClearBasket();
                 Console.WriteLine("\nМАГАЗИН: Спасибо за покупку!");
             }
             else
@@ -219,7 +213,22 @@ namespace Tasks_IJunior_02._06_OOP
             }
         }
 
-        private Product TryGetProduct(string productName, List<Product> products) 
+        private void DelFromBag(Client client)
+        {
+            Console.WriteLine("Введите название товара, который хотите убрать из корзины: ");
+            Console.Write("ПОКУПАТЕЛЬ: ");
+            string productDell = Console.ReadLine();
+
+            Product product = TryGetProduct(productDell, client.Basket);
+
+            if (product != null)
+            {
+                client.DeleteProductFromBasket(product);
+                Console.WriteLine($"\nПОКУПАТЕЛЬ: Убрал из корзины {product.Name}");
+            }
+        }
+
+        private Product TryGetProduct(string productName, List<Product> products)
         {
             if (products.Count > 0)
             {
@@ -287,6 +296,26 @@ namespace Tasks_IJunior_02._06_OOP
             }
         }
 
+        public void AddProductInBasket(Product product)
+        {
+            _basket.Add(product);
+        }
+
+        public void AddProductInBag(Product product)
+        {
+            _bag.Add(product);
+        }
+
+        public void DeleteProductFromBasket(Product product)
+        {
+            _basket.Remove(product);
+        }
+
+        public void ClearBasket()
+        {
+            _basket.Clear();
+        }
+
         public bool SpendMoney(int amount)
         {
             if (_money >= amount)
@@ -321,4 +350,3 @@ namespace Tasks_IJunior_02._06_OOP
         }
     }
 }
-
