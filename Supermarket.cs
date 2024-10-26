@@ -170,10 +170,10 @@ namespace Tasks_IJunior_02._06_OOP
                     PutProductInBag(client);
                     break;
                 case CommandRemove:
-                    DelFromBag(client);
+                    DeleteFromBag(client);
                     break;
                 default:
-                    ShowError();
+                    ContinueShopping(client);
                     break;
             }
         }
@@ -184,36 +184,25 @@ namespace Tasks_IJunior_02._06_OOP
 
             while (client.Money < totalCost)
             {
+                client.ShowInfo();
                 Console.WriteLine($"\nМАГАЗИН: Покупателю не хватает денег для покупки. Общая сумма: {totalCost} руб.");
-                DelFromBag(client);
+                DeleteFromBag(client);
                 totalCost = IncreaseCost(client);
             }
 
-            if (client.Money >= totalCost)
+            foreach (Product productClient in client.Basket)
             {
-                foreach (Product productClient in client.Basket)
+                if (client.SpendMoney(productClient.Price))
                 {
-                    if (client.SpendMoney(productClient.Price))
-                    {
-                        client.AddProductInBag(productClient);
-                        _money += productClient.Price;
-                    }
-                    else
-                    {
-                        Console.WriteLine("\nПОКУПАТЕЛЬ: Не хватает денег для покупки");
-                    }
+                    client.AddProductInBag(productClient);
+                    _money += productClient.Price;
                 }
+            }
 
-                client.ClearBasket();
-                Console.WriteLine("\nМАГАЗИН: Спасибо за покупку!");
-            }
-            else
-            {
-                Console.WriteLine("\nПОКУПАТЕЛЬ: Не хватает денег для покупки");
-            }
+            client.ClearBasket();
         }
 
-        private void DelFromBag(Client client)
+        private void DeleteFromBag(Client client)
         {
             Console.WriteLine("Введите название товара, который хотите убрать из корзины: ");
             Console.Write("ПОКУПАТЕЛЬ: ");
@@ -226,6 +215,8 @@ namespace Tasks_IJunior_02._06_OOP
                 client.DeleteProductFromBasket(product);
                 Console.WriteLine($"\nПОКУПАТЕЛЬ: Убрал из корзины {product.Name}");
             }
+
+            ContinueShopping(client);
         }
 
         private Product TryGetProduct(string productName, List<Product> products)
