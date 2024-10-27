@@ -139,7 +139,7 @@ namespace Tasks_IJunior_02._06_OOP
 
             if (product != null)
             {
-                client.AddProductInBasket(product);
+                client.AddProduct("корзина", product);
                 Console.WriteLine($"\nПОКУПАТЕЛЬ: Положил в корзину: {product.Name}");
 
                 int totalCost = IncreaseCost(client);
@@ -194,7 +194,7 @@ namespace Tasks_IJunior_02._06_OOP
             {
                 if (client.SpendMoney(productClient.Price))
                 {
-                    client.AddProductInBag(productClient);
+                    client.AddProduct("сумка", productClient);
                     _money += productClient.Price;
                 }
             }
@@ -286,14 +286,16 @@ namespace Tasks_IJunior_02._06_OOP
             }
         }
 
-        public void AddProductInBasket(Product product)
+        public void AddProduct(string listType, Product product)
         {
-            _basket.Add(product);
-        }
-
-        public void AddProductInBag(Product product)
-        {
-            _bag.Add(product);
+            if (listType.ToLower() == "корзина")
+            {
+                _basket.Add(product);
+            }
+            else if (listType.ToLower() == "сумка")
+            {
+                _bag.Add(product);
+            }
         }
 
         public void DeleteProductFromBasket(Product product)
