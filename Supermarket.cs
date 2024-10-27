@@ -268,7 +268,6 @@ namespace Tasks_IJunior_02._06_OOP
 
         public int Money { get; private set; }
         public List<Product> Basket => new List<Product>(_basket);
-        public List<Product> Bag => new List<Product>(_bag);
 
         public void ShowInfo()
         {
@@ -276,7 +275,7 @@ namespace Tasks_IJunior_02._06_OOP
             Console.WriteLine($"Корзина: ");
             PrintListProducts(Basket);
             Console.WriteLine($"Сумка: ");
-            PrintListProducts(Bag);
+            PrintListProducts(_bag);
         }
 
         private void PrintListProducts(List<Product> products)
