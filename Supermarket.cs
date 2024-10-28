@@ -16,21 +16,21 @@ namespace Tasks_IJunior_02._06_OOP
     public class Market
     {
         private int _money = 0;
-        private List<Product> _listProductsSale = new List<Product>();
-        private Queue<Client> _queueClients = new Queue<Client>();
+        private List<Product> _products = new List<Product>();
+        private Queue<Client> _clients = new Queue<Client>();
 
         public void Work()
         {
             const string CommandBuyProduct = "1";
             const string CommandExit = "2";
 
-            CreateProductsForMarket();
-            CreateClientsForMarket();
+            CreateProducts();
+            CreateClients();
 
-            while (_queueClients.Count > 0)
+            while (_clients.Count > 0)
             {
                 ShowInfo();
-                Client client = _queueClients.Dequeue();
+                Client client = _clients.Dequeue();
 
                 bool isWork = true;
 
@@ -64,26 +64,26 @@ namespace Tasks_IJunior_02._06_OOP
         private void ShowInfo()
         {
             Console.WriteLine($"\nМАГАЗИН: Заработанные деньги: {_money} руб.");
-            PrintListProductsSale();
-            PrintQueueClients();
+            PrintProducts();
+            PrintClients();
         }
 
-        private void PrintListProductsSale()
+        private void PrintProducts()
         {
             Console.WriteLine("\nМАГАЗИН: Все товары: \n");
 
-            for (int i = 0; i < _listProductsSale.Count; i++)
+            for (int i = 0; i < _products.Count; i++)
             {
-                _listProductsSale[i].ShowInfo();
+                _products[i].ShowInfo();
             }
         }
 
-        private void PrintQueueClients()
+        private void PrintClients()
         {
             Console.WriteLine("\nМАГАЗИН: Покупатели в очереди: ");
             int countClient = 1;
 
-            foreach (Client client in _queueClients.ToArray())
+            foreach (Client client in _clients.ToArray())
             {
                 Console.WriteLine($"\nПокупатель {countClient}: ");
                 client.ShowInfo();
@@ -103,22 +103,22 @@ namespace Tasks_IJunior_02._06_OOP
             Console.WriteLine("\nОШИБКА: Неккоректный ввод\n");
         }
 
-        private void CreateProductsForMarket()
+        private void CreateProducts()
         {
-            _listProductsSale.Add(new Product("Жевачка", "Dirol", 30));
-            _listProductsSale.Add(new Product("Шоколад", "Kinder", 50));
-            _listProductsSale.Add(new Product("Молоко", "Prostokvashino", 100));
-            _listProductsSale.Add(new Product("Вино", "Kabirne", 600));
-            _listProductsSale.Add(new Product("Криветки", "Restoria", 1000));
+            _products.Add(new Product("Жевачка", "Dirol", 30));
+            _products.Add(new Product("Шоколад", "Kinder", 50));
+            _products.Add(new Product("Молоко", "Prostokvashino", 100));
+            _products.Add(new Product("Вино", "Kabirne", 600));
+            _products.Add(new Product("Криветки", "Restoria", 1000));
         }
 
-        private void CreateClientsForMarket()
+        private void CreateClients()
         {
             List<int> clientsMoney = new List<int> { 1000, 300, 150 };
 
             foreach (int money in clientsMoney)
             {
-                _queueClients.Enqueue(new Client(money));
+                _clients.Enqueue(new Client(money));
             }
         }
 
@@ -135,7 +135,7 @@ namespace Tasks_IJunior_02._06_OOP
             Console.Write("ПОКУПАТЕЛЬ: ");
             string productSell = Console.ReadLine();
 
-            Product product = TryGetProduct(productSell, _listProductsSale);
+            Product product = TryGetProduct(productSell, _products);
 
             if (product != null)
             {
@@ -156,7 +156,7 @@ namespace Tasks_IJunior_02._06_OOP
             const string CommandRemove = "3";
 
             client.ShowInfo();
-            PrintListProductsSale();
+            PrintProducts();
             Console.WriteLine($"\nМАГАЗИН: {CommandPutProductInBasket} - выбрать еще какой-то товар {CommandBuy} - купить то, что в корзине {CommandRemove} - удалить какой-то товар?");
             Console.Write("ПОКУПАТЕЛЬ: ");
             string clientChose = Console.ReadLine();
@@ -262,11 +262,14 @@ namespace Tasks_IJunior_02._06_OOP
 
         public Client(int money)
         {
+            if (money < 0)
+            {
+                throw new InvalidOperationException("ОШИБКА: Сумма денег не может быть отрицательной");
+            }
             _money = money;
-            Money = money;
         }
 
-        public int Money { get; private set; }
+        public int Money => _money;
         public List<Product> Basket => new List<Product>(_basket);
 
         public void ShowInfo()
@@ -313,11 +316,11 @@ namespace Tasks_IJunior_02._06_OOP
             if (_money >= amount)
             {
                 _money -= amount;
-                Money = _money;
                 return true;
             }
             else
             {
+                Console.WriteLine("ОШИБКА: Недостаточно средств.");
                 return false;
             }
         }
