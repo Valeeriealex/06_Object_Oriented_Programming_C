@@ -201,7 +201,6 @@ namespace Tasks_IJunior_02._06_OOP
 
             client.ClearBasket();
         }
-
         private void DeleteFromBag(Client client)
         {
             Console.WriteLine("Введите название товара, который хотите убрать из корзины: ");
@@ -218,7 +217,6 @@ namespace Tasks_IJunior_02._06_OOP
 
             ContinueShopping(client);
         }
-
         private Product TryGetProduct(string productName, List<Product> products)
         {
             if (products.Count > 0)
@@ -268,7 +266,7 @@ namespace Tasks_IJunior_02._06_OOP
             }
             _money = money;
         }
-
+        
         public int Money => _money;
         public List<Product> Basket => new List<Product>(_basket);
 
