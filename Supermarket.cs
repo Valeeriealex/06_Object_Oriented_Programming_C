@@ -238,7 +238,6 @@ namespace Tasks_IJunior_02._06_OOP
                 return null;
             }
         }
-
         private int IncreaseCost(Client client)
         {
             int totalCost = 0;
@@ -264,6 +263,7 @@ namespace Tasks_IJunior_02._06_OOP
             {
                 throw new InvalidOperationException("ОШИБКА: Сумма денег не может быть отрицательной");
             }
+            
             _money = money;
         }
         
