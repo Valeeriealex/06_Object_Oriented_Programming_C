@@ -29,8 +29,8 @@ namespace Tasks_IJunior_02._06_OOP
                 ShowInfo();
                 Client client = _clients.Dequeue();
                 System.Threading.Thread.Sleep(5000);
-                RandomizeProducts(client);
-                ProcessPayment(client);
+                TakeRandomProduct(client);
+                BuyRandomProduct(client);
                 System.Threading.Thread.Sleep(5000);
             }
 
@@ -86,7 +86,7 @@ namespace Tasks_IJunior_02._06_OOP
             }
         }
 
-        private void RandomizeProducts(Client client)
+        private void TakeRandomProduct(Client client)
         {
             Console.WriteLine($"\nМАГАЗИН: Пришел покупатель с балансом {client.Money} руб.");
             Random random = new Random();
@@ -108,14 +108,14 @@ namespace Tasks_IJunior_02._06_OOP
             }
         }
 
-        private void ProcessPayment(Client client)
+        private void BuyRandomProduct(Client client)
         {
             int totalCost = client.GetTotalCost();
 
             while (client.Money < totalCost)
             {
                 Console.WriteLine($"\nМАГАЗИН: Покупателю не хватает денег для покупки. Общая сумма: {totalCost} руб.");
-                client.RemoveRandomProductFromBasket();
+                client.RemoveRandomProduct();
                 totalCost = client.GetTotalCost();
                 client.ShowInfo();
                 System.Threading.Thread.Sleep(5000);
@@ -164,12 +164,12 @@ namespace Tasks_IJunior_02._06_OOP
         {
             Console.WriteLine($"\nКошелек: {Money}");
             Console.WriteLine($"Корзина: ");
-            PrintListProducts(Basket);
+            PrintProducts(Basket);
             Console.WriteLine($"Сумка: ");
-            PrintListProducts(_bag);
+            PrintProducts(_bag);
         }
 
-        private void PrintListProducts(List<Product> products)
+        private void PrintProducts(List<Product> products)
         {
             for (int i = 0; i < products.Count; i++)
             {
@@ -215,7 +215,7 @@ namespace Tasks_IJunior_02._06_OOP
             return totalCost;
         }
 
-        public void RemoveRandomProductFromBasket()
+        public void RemoveRandomProduct()
         {
             if (_basket.Count > 0)
             {
