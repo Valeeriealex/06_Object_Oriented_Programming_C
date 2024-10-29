@@ -21,9 +21,6 @@ namespace Tasks_IJunior_02._06_OOP
 
         public void Work()
         {
-            const string CommandBuyProduct = "1";
-            const string CommandExit = "2";
-
             CreateProducts();
             CreateClients();
 
@@ -31,31 +28,10 @@ namespace Tasks_IJunior_02._06_OOP
             {
                 ShowInfo();
                 Client client = _clients.Dequeue();
-
-                bool isWork = true;
-
-                while (isWork)
-                {
-                    Console.WriteLine($"\nМАГАЗИН: Покупатель с балансом {client.Money} руб.");
-                    Console.WriteLine("\nМАГАЗИН: Желаете преобрести какой-то товар?");
-                    Console.WriteLine($"ПОКУПАТЕЛЬ: {CommandBuyProduct} - Да, желаю купить товар {CommandExit} - Нет, я ухожу ");
-                    Console.Write("ПОКУПАТЕЛЬ: ");
-
-                    switch (Console.ReadLine())
-                    {
-                        case CommandBuyProduct:
-                            TransferProduct(client);
-                            break;
-
-                        case CommandExit:
-                            isWork = Exit();
-                            break;
-
-                        default:
-                            ShowError();
-                            break;
-                    }
-                }
+                System.Threading.Thread.Sleep(5000);
+                RandomizeProducts(client);
+                ProcessPayment(client);
+                System.Threading.Thread.Sleep(5000);
             }
 
             Console.WriteLine("\nМАГАЗИН: Нет покупателей в очереди");
@@ -91,18 +67,6 @@ namespace Tasks_IJunior_02._06_OOP
             }
         }
 
-        private bool Exit()
-        {
-            Console.WriteLine("\nМАГАЗИН: Спасибо, что посетили наc, ждем Вас снова. Досвидания!");
-            Console.WriteLine("ПОКУПАТЕЛЬ: Спасибо! Досвидания!");
-            return false;
-        }
-
-        private void ShowError()
-        {
-            Console.WriteLine("\nОШИБКА: Неккоректный ввод\n");
-        }
-
         private void CreateProducts()
         {
             _products.Add(new Product("Жевачка", "Dirol", 30));
@@ -122,72 +86,44 @@ namespace Tasks_IJunior_02._06_OOP
             }
         }
 
-        private void TransferProduct(Client client)
+        private void RandomizeProducts(Client client)
         {
-            PutProductInBasket(client);
-            Console.WriteLine("ПОКУПАТЕЛЬ: ");
-            client.ShowInfo();
-        }
+            Console.WriteLine($"\nМАГАЗИН: Пришел покупатель с балансом {client.Money} руб.");
+            Random random = new Random();
+            int numberOfProducts = random.Next(1, _products.Count + 1);
+            HashSet<Product> selectedProducts = new HashSet<Product>();
 
-        private void PutProductInBasket(Client client)
-        {
-            Console.WriteLine("\nМАГАЗИН: Название товара? ");
-            Console.Write("ПОКУПАТЕЛЬ: ");
-            string productSell = Console.ReadLine();
+            while (selectedProducts.Count < numberOfProducts)
+            {
+                int index = random.Next(_products.Count);
+                selectedProducts.Add(_products[index]);
+            }
 
-            Product product = TryGetProduct(productSell, _products);
-
-            if (product != null)
+            foreach (var product in selectedProducts)
             {
                 client.AddProduct("корзина", product);
                 Console.WriteLine($"\nПОКУПАТЕЛЬ: Положил в корзину: {product.Name}");
-
-                int totalCost = IncreaseCost(client);
-                Console.WriteLine($"Общая сумма: {totalCost}");
-            }
-
-            ContinueShopping(client);
-        }
-
-        private void ContinueShopping(Client client)
-        {
-            const string CommandPutProductInBasket = "1";
-            const string CommandBuy = "2";
-            const string CommandRemove = "3";
-
-            client.ShowInfo();
-            PrintProducts();
-            Console.WriteLine($"\nМАГАЗИН: {CommandPutProductInBasket} - выбрать еще какой-то товар {CommandBuy} - купить то, что в корзине {CommandRemove} - удалить какой-то товар?");
-            Console.Write("ПОКУПАТЕЛЬ: ");
-            string clientChose = Console.ReadLine();
-
-            switch (clientChose)
-            {
-                case CommandPutProductInBasket:
-                    PutProductInBasket(client);
-                    break;
-                case CommandBuy:
-                    PutProductInBag(client);
-                    break;
-                case CommandRemove:
-                    DeleteFromBag(client);
-                    break;
-                default:
-                    ContinueShopping(client);
-                    break;
+                client.ShowInfo();
+                System.Threading.Thread.Sleep(5000);
             }
         }
 
-        private void PutProductInBag(Client client)
+        private void ProcessPayment(Client client)
         {
-            int totalCost = IncreaseCost(client);
+            int totalCost = client.GetTotalCost();
 
             while (client.Money < totalCost)
             {
-                client.ShowInfo();
                 Console.WriteLine($"\nМАГАЗИН: Покупателю не хватает денег для покупки. Общая сумма: {totalCost} руб.");
-                DeleteFromBag(client);
-                totalCost = IncreaseCost(client);
+                client.RemoveRandomProductFromBasket();
+                totalCost = client.GetTotalCost();
+                client.ShowInfo();
+                System.Threading.Thread.Sleep(5000);
+            }
+
+            if (client.Basket.Count == 0)
+            {
+                Console.WriteLine("\nПОКУПАТЕЛЬ: Ничего не купил.");
             }
 
             foreach (Product productClient in client.Basket)
@@ -196,61 +132,13 @@ namespace Tasks_IJunior_02._06_OOP
                 {
                     client.AddProduct("сумка", productClient);
                     _money += productClient.Price;
+                    Console.WriteLine($"\nМАГАЗИН: Покупателю хватает денег для покупки. Он купил: {productClient.Name}");
                 }
             }
 
             client.ClearBasket();
-        }
-
-        private void DeleteFromBag(Client client)
-        {
-            Console.WriteLine("Введите название товара, который хотите убрать из корзины: ");
-            Console.Write("ПОКУПАТЕЛЬ: ");
-            string productDell = Console.ReadLine();
-
-            Product product = TryGetProduct(productDell, client.Basket);
-
-            if (product != null)
-            {
-                client.DeleteProductFromBasket(product);
-                Console.WriteLine($"\nПОКУПАТЕЛЬ: Убрал из корзины {product.Name}");
-            }
-
-            ContinueShopping(client);
-        }
-
-        private Product TryGetProduct(string productName, List<Product> products)
-        {
-            if (products.Count > 0)
-            {
-                foreach (Product element in products)
-                {
-                    if (element.Name.ToLower() == productName.ToLower())
-                    {
-                        return element;
-                    }
-                }
-
-                Console.WriteLine("\nМАГАЗИН: Данного товара нет");
-                return null;
-            }
-            else
-            {
-                Console.WriteLine("\nМАГАЗИН: Закончились все товары");
-                return null;
-            }
-        }
-
-        private int IncreaseCost(Client client)
-        {
-            int totalCost = 0;
-
-            foreach (Product clientProduct in client.Basket)
-            {
-                totalCost += clientProduct.Price;
-            }
-
-            return totalCost;
+            client.ShowInfo();
+            System.Threading.Thread.Sleep(5000);
         }
     }
 
@@ -263,7 +151,7 @@ namespace Tasks_IJunior_02._06_OOP
         {
             if (money < 0)
             {
-                throw new InvalidOperationException("ОШИБКА: Сумма денег не может быть отрицательной");
+                throw new InvalidOperationException("\nОШИБКА: Сумма денег не может быть отрицательной");
             }
 
             Money = money;
@@ -274,7 +162,7 @@ namespace Tasks_IJunior_02._06_OOP
 
         public void ShowInfo()
         {
-            Console.WriteLine($"Кошелек: {Money}");
+            Console.WriteLine($"\nКошелек: {Money}");
             Console.WriteLine($"Корзина: ");
             PrintListProducts(Basket);
             Console.WriteLine($"Сумка: ");
@@ -301,16 +189,6 @@ namespace Tasks_IJunior_02._06_OOP
             }
         }
 
-        public void DeleteProductFromBasket(Product product)
-        {
-            _basket.Remove(product);
-        }
-
-        public void ClearBasket()
-        {
-            _basket.Clear();
-        }
-
         public bool SpendMoney(int amount)
         {
             if (Money >= amount)
@@ -320,9 +198,38 @@ namespace Tasks_IJunior_02._06_OOP
             }
             else
             {
-                Console.WriteLine("ОШИБКА: Недостаточно средств.");
+                Console.WriteLine("\nОШИБКА: Недостаточно средств.");
                 return false;
             }
+        }
+
+        public int GetTotalCost()
+        {
+            int totalCost = 0;
+
+            foreach (Product clientProduct in _basket)
+            {
+                totalCost += clientProduct.Price;
+            }
+
+            return totalCost;
+        }
+
+        public void RemoveRandomProductFromBasket()
+        {
+            if (_basket.Count > 0)
+            {
+                Random random = new Random();
+                int index = random.Next(_basket.Count);
+                Product productToRemove = _basket[index];
+                _basket.RemoveAt(index);
+                Console.WriteLine($"\nПОКУПАТЕЛЬ: Убрал из корзины {productToRemove.Name}");
+            }
+        }
+
+        public void ClearBasket()
+        {
+            _basket.Clear();
         }
     }
 
