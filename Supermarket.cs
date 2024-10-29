@@ -201,6 +201,7 @@ namespace Tasks_IJunior_02._06_OOP
 
             client.ClearBasket();
         }
+
         private void DeleteFromBag(Client client)
         {
             Console.WriteLine("Введите название товара, который хотите убрать из корзины: ");
@@ -217,6 +218,7 @@ namespace Tasks_IJunior_02._06_OOP
 
             ContinueShopping(client);
         }
+
         private Product TryGetProduct(string productName, List<Product> products)
         {
             if (products.Count > 0)
@@ -238,6 +240,7 @@ namespace Tasks_IJunior_02._06_OOP
                 return null;
             }
         }
+
         private int IncreaseCost(Client client)
         {
             int totalCost = 0;
@@ -255,7 +258,6 @@ namespace Tasks_IJunior_02._06_OOP
     {
         private List<Product> _basket = new List<Product>();
         private List<Product> _bag = new List<Product>();
-        private int _money;
 
         public Client(int money)
         {
@@ -263,11 +265,11 @@ namespace Tasks_IJunior_02._06_OOP
             {
                 throw new InvalidOperationException("ОШИБКА: Сумма денег не может быть отрицательной");
             }
-            
-            _money = money;
+
+            Money = money;
         }
-        
-        public int Money => _money;
+
+        public int Money { get; private set; }
         public List<Product> Basket => new List<Product>(_basket);
 
         public void ShowInfo()
@@ -311,9 +313,9 @@ namespace Tasks_IJunior_02._06_OOP
 
         public bool SpendMoney(int amount)
         {
-            if (_money >= amount)
+            if (Money >= amount)
             {
-                _money -= amount;
+                Money -= amount;
                 return true;
             }
             else
