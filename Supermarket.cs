@@ -101,7 +101,7 @@ namespace Tasks_IJunior_02._06_OOP
 
             foreach (var product in selectedProducts)
             {
-                client.AddProduct("корзина", product);
+                client.AddProduct(product);
                 Console.WriteLine($"\nПОКУПАТЕЛЬ: Положил в корзину: {product.Name}");
                 client.ShowInfo();
                 System.Threading.Thread.Sleep(5000);
@@ -121,22 +121,7 @@ namespace Tasks_IJunior_02._06_OOP
                 System.Threading.Thread.Sleep(5000);
             }
 
-            if (client.Basket.Count == 0)
-            {
-                Console.WriteLine("\nПОКУПАТЕЛЬ: Ничего не купил.");
-            }
-
-            foreach (Product productClient in client.Basket)
-            {
-                if (client.SpendMoney(productClient.Price))
-                {
-                    client.AddProduct("сумка", productClient);
-                    _money += productClient.Price;
-                    Console.WriteLine($"\nМАГАЗИН: Покупателю хватает денег для покупки. Он купил: {productClient.Name}");
-                }
-            }
-
-            client.ClearBasket();
+            client.MoveProducts();
             client.ShowInfo();
             System.Threading.Thread.Sleep(5000);
         }
@@ -177,15 +162,22 @@ namespace Tasks_IJunior_02._06_OOP
             }
         }
 
-        public void AddProduct(string listType, Product product)
+        public void AddProduct(Product product)
         {
-            if (listType.ToLower() == "корзина")
-            {
                 _basket.Add(product);
-            }
-            else if (listType.ToLower() == "сумка")
+        }
+
+        public void MoveProducts()
+        {
+            if (_basket.Count > 0)
             {
-                _bag.Add(product);
+                _bag.AddRange(_basket); 
+                _basket.Clear(); 
+                Console.WriteLine("\nПОКУПАТЕЛЬ: Все товары перемещены из корзины в сумку.");
+            }
+            else
+            {
+                Console.WriteLine("\nПОКУПАТЕЛЬ: Корзина пуста, нечего перемещать.");
             }
         }
 
@@ -252,3 +244,4 @@ namespace Tasks_IJunior_02._06_OOP
         }
     }
 }
+
