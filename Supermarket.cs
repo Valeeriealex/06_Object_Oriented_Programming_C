@@ -29,8 +29,8 @@ namespace Tasks_IJunior_02._06_OOP
                 ShowInfo();
                 Client client = _clients.Dequeue();
                 System.Threading.Thread.Sleep(5000);
-                TakeRandomProduct(client);
-                BuyRandomProduct(client);
+                FillClientBasket(client);
+                ServeClient(client);
                 System.Threading.Thread.Sleep(5000);
             }
 
@@ -86,7 +86,7 @@ namespace Tasks_IJunior_02._06_OOP
             }
         }
 
-        private void TakeRandomProduct(Client client)
+        private void FillClientBasket(Client client)
         {
             Console.WriteLine($"\nМАГАЗИН: Пришел покупатель с балансом {client.Money} руб.");
             Random random = new Random();
@@ -108,7 +108,7 @@ namespace Tasks_IJunior_02._06_OOP
             }
         }
 
-        private void BuyRandomProduct(Client client)
+        private void ServeClient(Client client)
         {
             int totalCost = client.GetTotalCost();
 
@@ -121,7 +121,7 @@ namespace Tasks_IJunior_02._06_OOP
                 System.Threading.Thread.Sleep(5000);
             }
 
-            client.MoveProducts();
+            client.MoveProducts(totalCost);
             client.ShowInfo();
             System.Threading.Thread.Sleep(5000);
         }
@@ -143,34 +143,17 @@ namespace Tasks_IJunior_02._06_OOP
         }
 
         public int Money { get; private set; }
-        public List<Product> Basket => new List<Product>(_basket);
-
-        public void ShowInfo()
-        {
-            Console.WriteLine($"\nКошелек: {Money}");
-            Console.WriteLine($"Корзина: ");
-            PrintProducts(Basket);
-            Console.WriteLine($"Сумка: ");
-            PrintProducts(_bag);
-        }
-
-        private void PrintProducts(List<Product> products)
-        {
-            for (int i = 0; i < products.Count; i++)
-            {
-                products[i].ShowInfo();
-            }
-        }
 
         public void AddProduct(Product product)
         {
                 _basket.Add(product);
         }
 
-        public void MoveProducts()
+        public void MoveProducts(int totalCost)
         {
             if (_basket.Count > 0)
             {
+                SpendMoney(totalCost);
                 _bag.AddRange(_basket); 
                 _basket.Clear(); 
                 Console.WriteLine("\nПОКУПАТЕЛЬ: Все товары перемещены из корзины в сумку.");
@@ -218,10 +201,21 @@ namespace Tasks_IJunior_02._06_OOP
                 Console.WriteLine($"\nПОКУПАТЕЛЬ: Убрал из корзины {productToRemove.Name}");
             }
         }
-
-        public void ClearBasket()
+        public void ShowInfo()
         {
-            _basket.Clear();
+            Console.WriteLine($"\nКошелек: {Money}");
+            Console.WriteLine($"Корзина: ");
+            PrintProducts(_basket);
+            Console.WriteLine($"Сумка: ");
+            PrintProducts(_bag);
+        }
+
+        private void PrintProducts(List<Product> products)
+        {
+            for (int i = 0; i < products.Count; i++)
+            {
+                products[i].ShowInfo();
+            }
         }
     }
 
@@ -244,4 +238,3 @@ namespace Tasks_IJunior_02._06_OOP
         }
     }
 }
-
