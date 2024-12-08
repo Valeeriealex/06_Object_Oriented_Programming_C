@@ -1,0 +1,415 @@
+using System;
+using System.Collections.Generic;
+using System.Threading;
+
+namespace Tasks_IJunior_02._06_OOP
+{
+    internal class War
+    {
+        public static void Main(string[] args)
+        {
+            Battle battle = new Battle();
+            battle.StartBattle();
+        }
+    }
+
+    public class Battle
+    {
+        private ArmyElves _elvesArmy = new ArmyElves();
+        private ArmyOrcs _orcsArmy = new ArmyOrcs();
+
+        public void StartBattle()
+        {
+            List<Fighter> elvesFighters = _elvesArmy.GetFighters();
+            List<Fighter> orcsFighters = _orcsArmy.GetFighters();
+
+            ShowState(elvesFighters, orcsFighters);
+            Fight(elvesFighters, orcsFighters);
+        }
+
+        private void Fight(List<Fighter> elvesFighters, List<Fighter> orcsFighters)
+        {
+            Console.WriteLine("Началось новое сражение!");
+            string nameElves = _elvesArmy.GetName();
+            string nameOrcs = _orcsArmy.GetName();
+
+            while (elvesFighters.Count > 0 && orcsFighters.Count > 0)
+            {
+                Console.WriteLine($"Аттакует {nameElves}");
+                Attack(elvesFighters, orcsFighters);
+
+                if (orcsFighters.Count > 0)
+                {
+                    Console.WriteLine($"Аттакует {nameOrcs}");
+                    Attack(orcsFighters, elvesFighters);
+                }
+
+                ShowState(elvesFighters, orcsFighters);
+            }
+
+            DetermineWinner(elvesFighters, orcsFighters);
+        }
+
+        private void Attack(List<Fighter> attackingFighters, List<Fighter> defendingFighters)
+        {
+            int attackingIndex = UserUtils.GenerateRandomNumber(attackingFighters.Count);
+            //int defendingIndex = UserUtils.GenerateRandomNumber(defendingFighters.Count);
+            Fighter attackingFighter = attackingFighters[attackingIndex];
+            //Fighter defendingFighter = defendingFighters[defendingIndex];
+
+            Console.WriteLine($"{attackingFighter.GetType().Name} атакует {defendingFighter.GetType().Name}");
+
+            bool attackerWins = attackingFighter.Attack(defendingFighters);
+
+            if (attackerWins)
+            {
+                Console.WriteLine($"{attackingFighter.GetType().Name} победил {defendingFighter.GetType().Name}");
+                defendingFighters.Remove(defendingFighter);
+            }
+            else
+            {
+                Console.WriteLine($"{defendingFighter.GetType().Name} победил {attackingFighter.GetType().Name}");
+                attackingFighters.Remove(attackingFighter);
+            }
+        }
+
+        private void DetermineWinner(List<Fighter> elvesFighters, List<Fighter> orcsFighters)
+        {
+            int minimumHealth = 0;
+
+            if (elvesFighters.Count == orcsFighters.Count)
+            {
+                Console.WriteLine("Ничья!");
+            }
+            else if (elvesFighters.Count > minimumHealth && orcsFighters.Count == minimumHealth)
+            {
+                Console.WriteLine($"Победила армия эльфов!");
+            }
+            else if (orcsFighters.Count > minimumHealth && elvesFighters.Count == minimumHealth)
+            {
+                Console.WriteLine($"Победила армия орков!");
+            }
+        }
+
+        private void ShowState(List<Fighter> elvesFighters, List<Fighter> orcsFighters)
+        {
+            Console.WriteLine($"Количество бойцов эльфов: {elvesFighters.Count}");
+            Console.WriteLine($"Количество бойцов орков: {orcsFighters.Count}");
+        }
+    }
+
+    public class ArmyElves : Army
+    {
+        string name = "Армия эльфов";
+        private List<Fighter> _fighterElves;
+
+        public ArmyElves()
+        {
+
+            _fighterElves = new List<Fighter>();
+            FillArmy(_fighterElves);
+        }
+
+        public List<Fighter> GetFighters()
+        {
+            return _fighterElves;
+        }
+
+        public string GetName()
+        {
+            return name;
+        }
+    }
+
+    public class ArmyOrcs : Army
+    {
+        string name = "Армия орков";
+        private List<Fighter> _fighterOrcs;
+
+        public ArmyOrcs()
+        {
+            string name = "Армия орков";
+            _fighterOrcs = new List<Fighter>();
+            FillArmy(_fighterOrcs);
+        }
+
+        public List<Fighter> GetFighters()
+        {
+            return _fighterOrcs;
+        }
+
+        public string GetName()
+        {
+            return name;
+        }
+    }
+
+    public class Army
+    {
+        public void FillArmy(List<Fighter> army)
+        {
+            int minimumNumberFighters = 10;
+            int maximumNumberFighters = 100;
+            int numberFighterTypes = 4;
+
+            int numberOfFighters = UserUtils.GenerateRandomNumbers(minimumNumberFighters, maximumNumberFighters);
+
+            for (int i = 0; i < numberOfFighters; i++)
+            {
+                int randomIndex = UserUtils.GenerateRandomNumber(numberFighterTypes);
+                Fighter fighter = CreateFighter(randomIndex);
+                army.Add(fighter);
+            }
+        }
+
+        private Fighter CreateFighter(int index)
+        {
+            switch (index)
+            {
+                case 0:
+                    return new FightersNumberOne();
+                case 1:
+                    return new FightersNumberTwo();
+                case 2:
+                    return new FightersNumberThree();
+                case 3:
+                    return new FightersNumberFour();
+                default:
+                    throw new ArgumentOutOfRangeException("Неверный индекс");
+            }
+        }
+    }
+
+    public class FightersNumberOne : Fighter
+    {
+        public override Fighter Clone()
+        {
+            return new FightersNumberOne();
+        }
+
+        public override string GetName()
+        {
+            return "Первый - обычный солдат, без особенностей";
+        }
+
+        public override bool Attack(Fighter opponent)
+        {
+            return base.Attack(opponent);
+        }
+    }
+
+    public class FightersNumberTwo : Fighter
+    {
+        public override Fighter Clone()
+        {
+            return new FightersNumberTwo();
+        }
+
+        public override string GetName()
+        {
+            return "Второй - атакует только одного, но с множителем урона";
+
+        }
+
+        public override bool Attack(Fighter opponent)
+        {
+            int twoDamage = 2;
+            int damageDealt = GenerateRandomDamage() * twoDamage;
+            int randomArmorPenetration = GenerateRandomDamage();
+            int totalDamage = damageDealt + randomArmorPenetration;
+            opponent.TakeDamage(damageDealt, randomArmorPenetration);
+            Console.WriteLine($"Нанесен урон {totalDamage}!");
+            Thread.Sleep(2000);
+
+            if (opponent.Health <= 0)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+    }
+
+    public class FightersNumberThree : Fighter
+    {
+        public override Fighter Clone()
+        {
+            return new FightersNumberThree();
+        }
+
+        public override string GetName()
+        {
+            return "Третий - атакует сразу нескольких, без повторения атакованного за свою атаку";
+        }
+
+        public override bool Attack(List<Fighter> enemySoldiers)
+        {
+            if (enemySoldiers.Count == 0) return;
+
+            var targets = new List<Fighter>();
+
+            int randomDamage = GenerateRandomDamage();
+            int randomArmorPenetration = GenerateRandomDamage();
+            int totalDamage = randomDamage + randomArmorPenetration;
+
+            for (int i = 0; i < 3; i++)
+            {
+                var targetIndex = UserUtils.GenerateRandomNumber(enemySoldiers.Count);
+                var target = enemySoldiers[targetIndex];
+
+                if (!targets.Contains(target))
+                {
+                    targets.Add(target);
+                }
+                else
+                {
+                    i--;
+                }
+            }
+
+            foreach (var target in targets)
+            {
+                target.TakeDamage(randomDamage, randomArmorPenetration);
+                Console.WriteLine($"Нанесен урон {totalDamage}!");
+                Thread.Sleep(2000);
+            }
+
+            if (targets.Count <= 0)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+    }
+
+    public class FightersNumberFour : Fighter
+    {
+        public override Fighter Clone()
+        {
+            return new FightersNumberFour();
+        }
+
+        public override string GetName()
+        {
+            return "Четвертый - атакует сразу нескольких, атакованные солдаты могут повторяться";
+        }
+
+        public override bool Attack(Fighter opponent)
+        {
+            List<Fighter> faghters = new List<Fighter>();
+            faghters.Add(opponent);
+
+            int randomDamage = GenerateRandomDamage();
+            int randomArmorPenetration = GenerateRandomDamage();
+
+            for (int i = 0; i < faghters.Count; i++)
+            {
+                opponent.TakeDamage(randomDamage);
+                Console.WriteLine($"Нанесен урон {randomDamage}!");
+                Thread.Sleep(2000);
+                faghters.RemoveAt(i);
+            }
+
+            if (faghters.Count <= 0)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+    }
+
+    public class Fighter
+    {
+        public Fighter()
+        {
+            Health = 100;
+            Damage = GenerateRandomDamage();
+            Armor = 10;
+        }
+
+        public int Health { get; protected set; }
+        public int Damage { get; private set; }
+        public int Armor { get; private set; }
+
+        public virtual Fighter Clone()
+        {
+            return new Fighter();
+        }
+
+        public virtual string GetName()
+        {
+            string name = "Боец";
+            return name;
+        }
+
+        public virtual bool Attack(List<Fighter> enemySoldiers)
+        {
+            int opponentIndex = UserUtils.GenerateRandomNumber(enemySoldiers.Count);
+            Fighter opponent = enemySoldiers[opponentIndex];
+
+            int randomDamageHealth = GenerateRandomDamage();
+            int randomArmorPenetration = GenerateRandomDamage();
+            int totalDamage = randomDamageHealth + randomArmorPenetration;
+
+            opponent.TakeDamage(randomDamageHealth, randomArmorPenetration);
+            Console.WriteLine($"Нанесен урон {totalDamage}!");
+            Thread.Sleep(2000);
+
+            if (opponent.Health <= 0)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        protected virtual int GenerateRandomDamage()
+        {
+            int minDamage = 1;
+            int maxDamage = 20;
+            return UserUtils.GenerateRandomNumbers(minDamage, maxDamage + 1);
+        }
+
+        public void TakeDamage(int damageHealth, int armorPenetration)
+        {
+            Health -= damageHealth;
+            Armor -= armorPenetration;
+            int minimum = 0;
+
+            if (Health < minimum)
+            {
+                Health = minimum;
+            }
+
+            if (Armor < minimum)
+            {
+                Armor = minimum;
+            }
+        }
+    }
+
+    public class UserUtils
+    {
+        private static Random s_random = new Random();
+
+        public static int GenerateRandomNumbers(int min, int max)
+        {
+            return s_random.Next(min, max);
+        }
+
+        public static int GenerateRandomNumber(int number)
+        {
+            return s_random.Next(number);
+        }
+    }
+}
