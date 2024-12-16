@@ -53,23 +53,19 @@ namespace Tasks_IJunior_02._06_OOP
         private void Attack(List<Fighter> attackingFighters, List<Fighter> defendingFighters)
         {
             int attackingIndex = UserUtils.GenerateRandomNumber(attackingFighters.Count);
-            //int defendingIndex = UserUtils.GenerateRandomNumber(defendingFighters.Count);
             Fighter attackingFighter = attackingFighters[attackingIndex];
-            //Fighter defendingFighter = defendingFighters[defendingIndex];
 
-            Console.WriteLine($"{attackingFighter.GetType().Name} атакует {defendingFighter.GetType().Name}");
+            Console.WriteLine($"{attackingFighter.GetType().Name} атакует");
 
             bool attackerWins = attackingFighter.Attack(defendingFighters);
 
             if (attackerWins)
             {
-                Console.WriteLine($"{attackingFighter.GetType().Name} победил {defendingFighter.GetType().Name}");
-                defendingFighters.Remove(defendingFighter);
+                Console.WriteLine($"{attackingFighter.GetType().Name} победил");
             }
             else
             {
-                Console.WriteLine($"{defendingFighter.GetType().Name} победил {attackingFighter.GetType().Name}");
-                attackingFighters.Remove(attackingFighter);
+                Console.WriteLine($"{attackingFighter.GetType().Name} проиграл");
             }
         }
 
@@ -128,7 +124,6 @@ namespace Tasks_IJunior_02._06_OOP
 
         public ArmyOrcs()
         {
-            string name = "Армия орков";
             _fighterOrcs = new List<Fighter>();
             FillArmy(_fighterOrcs);
         }
@@ -148,8 +143,8 @@ namespace Tasks_IJunior_02._06_OOP
     {
         public void FillArmy(List<Fighter> army)
         {
-            int minimumNumberFighters = 10;
-            int maximumNumberFighters = 100;
+            int minimumNumberFighters = 5;
+            int maximumNumberFighters = 10;
             int numberFighterTypes = 4;
 
             int numberOfFighters = UserUtils.GenerateRandomNumbers(minimumNumberFighters, maximumNumberFighters);
@@ -192,9 +187,9 @@ namespace Tasks_IJunior_02._06_OOP
             return "Первый - обычный солдат, без особенностей";
         }
 
-        public override bool Attack(Fighter opponent)
+        public override bool Attack(List<Fighter> enemySoldiers)
         {
-            return base.Attack(opponent);
+            return base.Attack(enemySoldiers);
         }
     }
 
@@ -211,18 +206,23 @@ namespace Tasks_IJunior_02._06_OOP
 
         }
 
-        public override bool Attack(Fighter opponent)
+        public override bool Attack(List<Fighter> enemySoldiers)
         {
+            int opponentIndex = UserUtils.GenerateRandomNumber(enemySoldiers.Count);
+            Fighter opponent = enemySoldiers[opponentIndex];
+
             int twoDamage = 2;
             int damageDealt = GenerateRandomDamage() * twoDamage;
             int randomArmorPenetration = GenerateRandomDamage();
             int totalDamage = damageDealt + randomArmorPenetration;
+
             opponent.TakeDamage(damageDealt, randomArmorPenetration);
             Console.WriteLine($"Нанесен урон {totalDamage}!");
             Thread.Sleep(2000);
 
             if (opponent.Health <= 0)
             {
+                enemySoldiers.Remove(opponent);
                 return true;
             }
             else
@@ -246,8 +246,6 @@ namespace Tasks_IJunior_02._06_OOP
 
         public override bool Attack(List<Fighter> enemySoldiers)
         {
-            if (enemySoldiers.Count == 0) return;
-
             var targets = new List<Fighter>();
 
             int randomDamage = GenerateRandomDamage();
@@ -274,6 +272,11 @@ namespace Tasks_IJunior_02._06_OOP
                 target.TakeDamage(randomDamage, randomArmorPenetration);
                 Console.WriteLine($"Нанесен урон {totalDamage}!");
                 Thread.Sleep(2000);
+
+                if (target.Health <= 0)
+                {
+                    enemySoldiers.Remove(target);
+                }
             }
 
             if (targets.Count <= 0)
@@ -299,30 +302,33 @@ namespace Tasks_IJunior_02._06_OOP
             return "Четвертый - атакует сразу нескольких, атакованные солдаты могут повторяться";
         }
 
-        public override bool Attack(Fighter opponent)
+        public override bool Attack(List<Fighter> enemySoldiers)
         {
-            List<Fighter> faghters = new List<Fighter>();
-            faghters.Add(opponent);
+            var targets = new List<Fighter>();
 
             int randomDamage = GenerateRandomDamage();
             int randomArmorPenetration = GenerateRandomDamage();
 
-            for (int i = 0; i < faghters.Count; i++)
+            bool anyEnemyDefeated = false;
+
+            for (int i = enemySoldiers.Count - 1; i >= 0; i--)
             {
-                opponent.TakeDamage(randomDamage);
+                var target = enemySoldiers[i];
+                targets.Add(target);
+
+                target.TakeDamage(randomDamage, randomArmorPenetration);
                 Console.WriteLine($"Нанесен урон {randomDamage}!");
                 Thread.Sleep(2000);
-                faghters.RemoveAt(i);
+
+                if (target.Health <= 0)
+                {
+                    enemySoldiers.RemoveAt(i);
+                    targets.Remove(target);
+                    anyEnemyDefeated = true;
+                }
             }
 
-            if (faghters.Count <= 0)
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+            return anyEnemyDefeated;
         }
     }
 
