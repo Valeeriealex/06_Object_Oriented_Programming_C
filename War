@@ -9,7 +9,7 @@ namespace Tasks_IJunior_02._06_OOP
         public static void Main(string[] args)
         {
             Battle battle = new Battle();
-            battle.StartBattle();
+            battle.NewBattle();
         }
     }
 
@@ -18,7 +18,7 @@ namespace Tasks_IJunior_02._06_OOP
         private Army _elvesArmy = new Army("Армия эльфов");
         private Army _orcsArmy = new Army("Армия орков");
 
-        public void StartBattle()
+        public void NewBattle()
         {
             List<Fighter> elvesFighters = _elvesArmy.GetFighters();
             List<Fighter> orcsFighters = _orcsArmy.GetFighters();
@@ -60,16 +60,22 @@ namespace Tasks_IJunior_02._06_OOP
             Console.WriteLine($"{attackingFighter.GetName()} атакует");
             Thread.Sleep(2000);
 
-            bool isAttackerWins = attackingFighter.canAttack(defendingFighters);
+            bool isAttackerWins = attackingFighter.CanAttack(defendingFighters);
 
-            if (isAttackerWins)
+            AttackerWins(isAttackerWins);
+        }
+
+        private void AttackerWins (bool isAttackerWins)
+        {
+
+            if (isAttackerWins == true)
             {
-                Console.WriteLine($"{attackingFighter.GetName()} победил");
+                 Console.WriteLine($"Он победил!");
                 Thread.Sleep(2000);
             }
             else
             {
-                Console.WriteLine($"{attackingFighter.GetName()} проиграл");
+                Console.WriteLine($"Он проиграл!");
                 Thread.Sleep(2000);
             }
         }
@@ -156,9 +162,9 @@ namespace Tasks_IJunior_02._06_OOP
             return "Обычный солдат без особенностей";
         }
 
-        public override bool canAttack(List<Fighter> enemySoldiers)
+        public override bool CanAttack(List<Fighter> enemySoldiers)
         {
-            return base.canAttack(enemySoldiers);
+            return base.CanAttack(enemySoldiers);
         }
     }
 
@@ -177,7 +183,7 @@ namespace Tasks_IJunior_02._06_OOP
 
         }
 
-        public override bool canAttack(List<Fighter> enemySoldiers)
+        public override bool CanAttack(List<Fighter> enemySoldiers)
         {
             int opponentIndex = UserUtils.GenerateRandomNumber(enemySoldiers.Count);
             Fighter opponent = enemySoldiers[opponentIndex];
@@ -194,7 +200,7 @@ namespace Tasks_IJunior_02._06_OOP
 
             if (opponent.Health <= 0)
             {
-                enemySoldiers.Remove(opponent);
+                opponent.RemoveFiter(enemySoldiers, opponent);
                 return true;
             }
             else
@@ -218,7 +224,7 @@ namespace Tasks_IJunior_02._06_OOP
             return "Солдат с несколькими уникальными противниками";
         }
 
-        public override bool canAttack(List<Fighter> enemySoldiers)
+        public override bool CanAttack(List<Fighter> enemySoldiers)
         {
             var targets = new HashSet<Fighter>();
 
@@ -251,18 +257,11 @@ namespace Tasks_IJunior_02._06_OOP
 
                 if (target.Health <= 0)
                 {
-                    enemySoldiers.Remove(target);
+                    target.RemoveFiter(enemySoldiers, target);
                 }
             }
-
-            if (targets.Count <= 0)
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+  
+                return targets.Count <= 0;
         }
     }
 
@@ -280,7 +279,7 @@ namespace Tasks_IJunior_02._06_OOP
             return "Солдат с несколькими противниками";
         }
 
-        public override bool canAttack(List<Fighter> enemySoldiers)
+        public override bool CanAttack(List<Fighter> enemySoldiers)
         {
             int randomDamage = GenerateRandomDamage();
             int randomArmorPenetration = GenerateRandomDamage();
@@ -298,7 +297,7 @@ namespace Tasks_IJunior_02._06_OOP
 
                 if (target.Health <= 0)
                 {
-                    enemySoldiers.RemoveAt(i);
+                    target.RemoveFiter(enemySoldiers, target);
                     isAnyEnemyDefeated = true;
                 }
             }
@@ -331,7 +330,7 @@ namespace Tasks_IJunior_02._06_OOP
             return name;
         }
 
-        public virtual bool canAttack(List<Fighter> enemySoldiers)
+        public virtual bool CanAttack(List<Fighter> enemySoldiers)
         {
             int opponentIndex = UserUtils.GenerateRandomNumber(enemySoldiers.Count);
             Fighter opponent = enemySoldiers[opponentIndex];
@@ -363,6 +362,11 @@ namespace Tasks_IJunior_02._06_OOP
             {
                 Armor = minimum;
             }
+        }
+
+        public void RemoveFiter(List<Fighter> enemySoldiers, Fighter opponent)
+        {
+            enemySoldiers.Remove(opponent);
         }
 
         protected virtual int GenerateRandomDamage()
