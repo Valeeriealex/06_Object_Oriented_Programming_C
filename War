@@ -20,88 +20,53 @@ namespace Tasks_IJunior_02._06_OOP
 
         public void NewBattle()
         {
-            List<Fighter> elvesFighters = _elvesArmy.GetFighters();
-            List<Fighter> orcsFighters = _orcsArmy.GetFighters();
-
-            ShowState(elvesFighters, orcsFighters);
-            Fight(elvesFighters, orcsFighters);
-            DetermineWinner(elvesFighters, orcsFighters);
+            ShowState();
+            Fight();
+            DetermineWinner();
         }
 
-        private void Fight(List<Fighter> elvesFighters, List<Fighter> orcsFighters)
+        private void Fight()
         {
             Console.WriteLine("Началось сражение!");
             Thread.Sleep(2000);
-            string nameElves = _elvesArmy.Name;
-            string nameOrcs = _orcsArmy.Name;
 
-            while (elvesFighters.Count > 0 && orcsFighters.Count > 0)
+            while (_elvesArmy.HasFighters() && _orcsArmy.HasFighters())
             {
-                Console.WriteLine($"\nАттакует {nameElves}");
-                Thread.Sleep(2000);
-                Attack(elvesFighters, orcsFighters);
+                _elvesArmy.Attack(_orcsArmy.GetFighters());
+                _orcsArmy.RemoveDead();
 
-                if (orcsFighters.Count > 0)
+                if (_orcsArmy.HasFighters())
                 {
-                    Console.WriteLine($"\nАттакует {nameOrcs}");
+                    Console.WriteLine($"\nАтакует {_orcsArmy.Name}");
                     Thread.Sleep(2000);
-                    Attack(orcsFighters, elvesFighters);
+                    _orcsArmy.Attack(_elvesArmy.GetFighters());
+                    _elvesArmy.RemoveDead();
                 }
 
-                ShowState(elvesFighters, orcsFighters);
+                ShowState();
             }
         }
 
-        private void Attack(List<Fighter> attackingFighters, List<Fighter> defendingFighters)
+        private void DetermineWinner()
         {
-            int attackingIndex = UserUtils.GenerateRandomNumber(attackingFighters.Count);
-            Fighter attackingFighter = attackingFighters[attackingIndex];
-
-            Console.WriteLine($"{attackingFighter.GetName()} атакует");
-            Thread.Sleep(2000);
-
-            bool isAttackerWins = attackingFighter.CanAttack(defendingFighters);
-
-            AttackerWins(isAttackerWins);
-        }
-
-        private void AttackerWins (bool isAttackerWins)
-        {
-
-            if (isAttackerWins == true)
-            {
-                 Console.WriteLine($"Он победил!");
-                Thread.Sleep(2000);
-            }
-            else
-            {
-                Console.WriteLine($"Он проиграл!");
-                Thread.Sleep(2000);
-            }
-        }
-
-        private void DetermineWinner(List<Fighter> elvesFighters, List<Fighter> orcsFighters)
-        {
-            int minimumHealth = 0;
-
-            if (elvesFighters.Count == orcsFighters.Count)
+            if (!_elvesArmy.HasFighters() && !_orcsArmy.HasFighters())
             {
                 Console.WriteLine("Ничья!");
             }
-            else if (elvesFighters.Count > minimumHealth && orcsFighters.Count == minimumHealth)
+            else if (_elvesArmy.HasFighters())
             {
                 Console.WriteLine($"Победила армия эльфов!");
             }
-            else if (orcsFighters.Count > minimumHealth && elvesFighters.Count == minimumHealth)
+            else
             {
                 Console.WriteLine($"Победила армия орков!");
             }
         }
 
-        private void ShowState(List<Fighter> elvesFighters, List<Fighter> orcsFighters)
+        private void ShowState()
         {
-            Console.WriteLine($"\nКоличество бойцов эльфов: {elvesFighters.Count}");
-            Console.WriteLine($"Количество бойцов орков: {orcsFighters.Count}\n");
+            Console.WriteLine($"\nКоличество бойцов эльфов: {_elvesArmy.GetFighters().Count}");
+            Console.WriteLine($"Количество бойцов орков: {_orcsArmy.GetFighters().Count}\n");
         }
     }
 
@@ -115,14 +80,31 @@ namespace Tasks_IJunior_02._06_OOP
             Name = name;
             _army = new List<Fighter>();
             InitializeFighterTypes();
-            FillArmy(_army);
+            FillArmy();
         }
 
         public string Name { get; private set; }
 
         public List<Fighter> GetFighters() => new List<Fighter>(_army);
 
-        public void FillArmy(List<Fighter> army)
+        public void Attack(List<Fighter> fighters)
+        {
+            foreach (Fighter fighter in _army)
+            {
+                Console.WriteLine($"\n{fighter.Name} атакует");
+                Thread.Sleep(2000);
+                fighter.CanAttack(fighters);
+            }
+        }
+
+        public void RemoveDead()
+        {
+            _army.RemoveAll(fighter => fighter.Health <= 0);
+        }
+
+        public bool HasFighters() => _army.Count > 0;
+
+        public void FillArmy()
         {
             int minimumNumberFighters = 3;
             int maximumNumberFighters = 5;
@@ -132,7 +114,7 @@ namespace Tasks_IJunior_02._06_OOP
             {
                 int randomIndex = UserUtils.GenerateRandomNumber(_fighterTypes.Count);
                 Fighter fighter = _fighterTypes[randomIndex].Clone();
-                army.Add(fighter);
+                _army.Add(fighter);
             }
         }
 
@@ -150,16 +132,11 @@ namespace Tasks_IJunior_02._06_OOP
 
     public class OrdinaryFighter : Fighter
     {
-        public OrdinaryFighter() : base(100, 10) { }
+        public OrdinaryFighter() : base(100, 10, "Обычный солдат без особенностей") { }
 
         public override Fighter Clone()
         {
             return new OrdinaryFighter();
-        }
-
-        public override string GetName()
-        {
-            return "Обычный солдат без особенностей";
         }
 
         public override bool CanAttack(List<Fighter> enemySoldiers)
@@ -170,17 +147,11 @@ namespace Tasks_IJunior_02._06_OOP
 
     public class DoubleDamageFighter : Fighter
     {
-        public DoubleDamageFighter() : base(50, 30) { }
+        public DoubleDamageFighter() : base(50, 30, "Солдат с множителем урона") { }
 
         public override Fighter Clone()
         {
             return new DoubleDamageFighter();
-        }
-
-        public override string GetName()
-        {
-            return "Солдат с множителем урона";
-
         }
 
         public override bool CanAttack(List<Fighter> enemySoldiers)
@@ -194,8 +165,8 @@ namespace Tasks_IJunior_02._06_OOP
             int totalDamage = damageDealt + randomArmorPenetration;
 
             opponent.TakeDamage(damageDealt, randomArmorPenetration);
-            Console.WriteLine($"Нанесен урон {totalDamage}!");
-            Console.WriteLine($"Состояние противника\nЗдоровье:{opponent.Health}\nБроня:{opponent.Armor}");
+            Console.WriteLine($"\nНанесен урон {totalDamage}!\n");
+            Console.WriteLine($"Состояние противника\nЗдоровье:{opponent.Health}\nБроня:{opponent.Armor}\n");
             Thread.Sleep(2000);
 
             if (opponent.Health <= 0)
@@ -212,16 +183,11 @@ namespace Tasks_IJunior_02._06_OOP
 
     public class FighterSeveralUniqueOpponents : Fighter
     {
-        public FighterSeveralUniqueOpponents() : base(70, 40) { }
+        public FighterSeveralUniqueOpponents() : base(70, 40, "Солдат с несколькими уникальными противниками") { }
 
         public override Fighter Clone()
         {
             return new FighterSeveralUniqueOpponents();
-        }
-
-        public override string GetName()
-        {
-            return "Солдат с несколькими уникальными противниками";
         }
 
         public override bool CanAttack(List<Fighter> enemySoldiers)
@@ -233,7 +199,7 @@ namespace Tasks_IJunior_02._06_OOP
             int totalDamage = randomDamage + randomArmorPenetration;
             int maximumTargets = 3;
 
-            if(enemySoldiers.Count < maximumTargets)
+            if (enemySoldiers.Count < maximumTargets)
             {
                 maximumTargets = enemySoldiers.Count;
             }
@@ -251,8 +217,8 @@ namespace Tasks_IJunior_02._06_OOP
             foreach (var target in targets)
             {
                 target.TakeDamage(randomDamage, randomArmorPenetration);
-                Console.WriteLine($"Нанесен урон {totalDamage}!");
-                Console.WriteLine($"Состояние противника\nЗдоровье:{target.Health}\nБроня:{target.Armor}");
+                Console.WriteLine($"\nНанесен урон {totalDamage}!\n");
+                Console.WriteLine($"Состояние противника\nЗдоровье:{target.Health}\nБроня:{target.Armor}\n");
                 Thread.Sleep(2000);
 
                 if (target.Health <= 0)
@@ -260,23 +226,18 @@ namespace Tasks_IJunior_02._06_OOP
                     target.RemoveFiter(enemySoldiers, target);
                 }
             }
-  
-                return targets.Count <= 0;
+
+            return targets.Count <= 0;
         }
     }
 
     public class FighterSeveralOpponents : Fighter
     {
-        public FighterSeveralOpponents() : base(90, 20) { }
+        public FighterSeveralOpponents() : base(90, 20, "Солдат с несколькими противниками") { }
 
         public override Fighter Clone()
         {
             return new FighterSeveralOpponents();
-        }
-
-        public override string GetName()
-        {
-            return "Солдат с несколькими противниками";
         }
 
         public override bool CanAttack(List<Fighter> enemySoldiers)
@@ -291,8 +252,8 @@ namespace Tasks_IJunior_02._06_OOP
                 var target = enemySoldiers[i];
 
                 target.TakeDamage(randomDamage, randomArmorPenetration);
-                Console.WriteLine($"Нанесен урон {randomDamage}!");
-                Console.WriteLine($"Состояние противника\nЗдоровье:{target.Health}\nБроня:{target.Armor}");
+                Console.WriteLine($"\nНанесен урон {randomDamage}!\n");
+                Console.WriteLine($"Состояние противника\nЗдоровье:{target.Health}\nБроня:{target.Armor}\n");
                 Thread.Sleep(2000);
 
                 if (target.Health <= 0)
@@ -308,26 +269,22 @@ namespace Tasks_IJunior_02._06_OOP
 
     public class Fighter
     {
-        public Fighter(int health, int armor)
+        public Fighter(int health, int armor, string name)
         {
             Damage = GenerateRandomDamage();
             Health = health;
             Armor = armor;
+            Name = name;
         }
 
         public int Damage { get; private set; }
         public int Health { get; protected set; }
         public int Armor { get; private set; }
+        public string Name { get; private set; }
 
         public virtual Fighter Clone()
         {
-            return new Fighter(Health, Armor);
-        }
-
-        public virtual string GetName()
-        {
-            string name = "Боец";
-            return name;
+            return new Fighter(Health, Armor, Name);
         }
 
         public virtual bool CanAttack(List<Fighter> enemySoldiers)
@@ -340,8 +297,8 @@ namespace Tasks_IJunior_02._06_OOP
             int totalDamage = randomDamageHealth + randomArmorPenetration;
 
             opponent.TakeDamage(randomDamageHealth, randomArmorPenetration);
-            Console.WriteLine($"Нанесен урон {totalDamage}!");
-            Console.WriteLine($"Состояние противника\nЗдоровье:{opponent.Health}\nБроня:{opponent.Armor}");
+            Console.WriteLine($"\nНанесен урон {totalDamage}!\n");
+            Console.WriteLine($"Состояние противника\nЗдоровье:{opponent.Health}\nБроня:{opponent.Armor}\n");
             Thread.Sleep(2000);
 
             return opponent.Health <= 0;
