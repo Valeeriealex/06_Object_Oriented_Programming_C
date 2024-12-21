@@ -32,15 +32,18 @@ namespace Tasks_IJunior_02._06_OOP
 
             while (_elvesArmy.HasFighters() && _orcsArmy.HasFighters())
             {
-                _elvesArmy.Attack(_orcsArmy.GetFighters());
-                _orcsArmy.RemoveDead();
+                Console.WriteLine($"\nАтакует {_elvesArmy.Name}");
+                Thread.Sleep(2000);
+                _elvesArmy.Attack(_orcsArmy.GetFighters(), _orcsArmy);
+                _orcsArmy.RemoveAllDeadFighters();
+                ShowState();
 
                 if (_orcsArmy.HasFighters())
                 {
                     Console.WriteLine($"\nАтакует {_orcsArmy.Name}");
                     Thread.Sleep(2000);
-                    _orcsArmy.Attack(_elvesArmy.GetFighters());
-                    _elvesArmy.RemoveDead();
+                    _orcsArmy.Attack(_elvesArmy.GetFighters(), _elvesArmy);
+                    _elvesArmy.RemoveAllDeadFighters();
                 }
 
                 ShowState();
@@ -87,17 +90,22 @@ namespace Tasks_IJunior_02._06_OOP
 
         public List<Fighter> GetFighters() => new List<Fighter>(_fighters);
 
-        public void Attack(List<Fighter> fighters)
+        public void Attack(List<Fighter> fighters, Army enemyArmy)
         {
             foreach (Fighter fighter in _fighters)
             {
                 Console.WriteLine($"\n{fighter.Name} атакует");
                 Thread.Sleep(2000);
-                fighter.CanAttack(fighters);
+                fighter.CanAttack(fighters, enemyArmy);
             }
         }
 
-        public void RemoveDead()
+        public void RemoveDeadFighter(Fighter opponent)
+        {
+            _fighters.Remove(opponent);
+        }
+
+        public void RemoveAllDeadFighters()
         {
             _fighters.RemoveAll(fighter => fighter.Health <= 0);
         }
@@ -139,9 +147,9 @@ namespace Tasks_IJunior_02._06_OOP
             return new OrdinaryFighter();
         }
 
-        public override bool CanAttack(List<Fighter> enemySoldiers)
+        public override bool CanAttack(List<Fighter> enemyFighter, Army enemyArmy)
         {
-            return base.CanAttack(enemySoldiers);
+            return base.CanAttack(enemyFighter, enemyArmy);
         }
     }
 
@@ -154,13 +162,13 @@ namespace Tasks_IJunior_02._06_OOP
             return new DoubleDamageFighter();
         }
 
-        public override bool CanAttack(List<Fighter> enemySoldiers)
+        public override bool CanAttack(List<Fighter> enemySoldiers, Army enemyArmy)
         {
             int opponentIndex = UserUtils.GenerateRandomNumber(enemySoldiers.Count);
             Fighter opponent = enemySoldiers[opponentIndex];
 
-            int twoDamage = 2;
-            int damageDealt = GenerateRandomDamage() * twoDamage;
+            int coefficientDamage = 2;
+            int damageDealt = GenerateRandomDamage() * coefficientDamage;
             int randomArmorPenetration = GenerateRandomDamage();
             int totalDamage = damageDealt + randomArmorPenetration;
 
@@ -169,9 +177,9 @@ namespace Tasks_IJunior_02._06_OOP
             Console.WriteLine($"Состояние противника\nЗдоровье:{opponent.Health}\nБроня:{opponent.Armor}\n");
             Thread.Sleep(2000);
 
-            if (opponent.Health <= 0)
+            if (IsFighterAlive(opponent) == false)
             {
-                opponent.RemoveFiter(enemySoldiers, opponent);
+                enemyArmy.RemoveDeadFighter(opponent);
                 return true;
             }
             else
@@ -190,28 +198,23 @@ namespace Tasks_IJunior_02._06_OOP
             return new FighterSeveralUniqueOpponents();
         }
 
-        public override bool CanAttack(List<Fighter> enemySoldiers)
+        public override bool CanAttack(List<Fighter> enemyFighter, Army enemyArmy)
         {
-            var targets = new HashSet<Fighter>();
-
             int randomDamage = GenerateRandomDamage();
             int randomArmorPenetration = GenerateRandomDamage();
             int totalDamage = randomDamage + randomArmorPenetration;
             int maximumTargets = 3;
+            var targets = new HashSet<Fighter>();
 
-            if (enemySoldiers.Count < maximumTargets)
+            if (enemyFighter.Count < maximumTargets)
             {
-                maximumTargets = enemySoldiers.Count;
+                maximumTargets = enemyFighter.Count;
             }
 
-            for (int i = 0; i < maximumTargets; i++)
+            while (targets.Count < maximumTargets)
             {
-                var targetIndex = UserUtils.GenerateRandomNumber(enemySoldiers.Count);
-                var target = enemySoldiers[targetIndex];
-
-                if (targets.Add(target) == false)
-
-                    i--;
+                int targetIndex = UserUtils.GenerateRandomNumber(enemyFighter.Count);
+                targets.Add(enemyFighter[targetIndex]);
             }
 
             foreach (var target in targets)
@@ -221,13 +224,14 @@ namespace Tasks_IJunior_02._06_OOP
                 Console.WriteLine($"Состояние противника\nЗдоровье:{target.Health}\nБроня:{target.Armor}\n");
                 Thread.Sleep(2000);
 
-                if (target.Health <= 0)
+                if (IsFighterAlive(target) == false)
                 {
-                    target.RemoveFiter(enemySoldiers, target);
+                    enemyArmy.RemoveDeadFighter(target);
+                    return true;
                 }
             }
 
-            return targets.Count <= 0;
+            return targets.Count > 0;
         }
     }
 
@@ -240,25 +244,25 @@ namespace Tasks_IJunior_02._06_OOP
             return new FighterSeveralOpponents();
         }
 
-        public override bool CanAttack(List<Fighter> enemySoldiers)
+        public override bool CanAttack(List<Fighter> enemyFighter, Army enemyArmy)
         {
             int randomDamage = GenerateRandomDamage();
             int randomArmorPenetration = GenerateRandomDamage();
 
             bool isAnyEnemyDefeated = false;
 
-            for (int i = enemySoldiers.Count - 1; i >= 0; i--)
+            for (int i = enemyFighter.Count - 1; i >= 0; i--)
             {
-                var target = enemySoldiers[i];
+                var target = enemyFighter[i];
 
                 target.TakeDamage(randomDamage, randomArmorPenetration);
                 Console.WriteLine($"\nНанесен урон {randomDamage}!\n");
                 Console.WriteLine($"Состояние противника\nЗдоровье:{target.Health}\nБроня:{target.Armor}\n");
                 Thread.Sleep(2000);
 
-                if (target.Health <= 0)
+                if (IsFighterAlive(target) == false)
                 {
-                    target.RemoveFiter(enemySoldiers, target);
+                    enemyArmy.RemoveDeadFighter(target);
                     isAnyEnemyDefeated = true;
                 }
             }
@@ -287,10 +291,10 @@ namespace Tasks_IJunior_02._06_OOP
             return new Fighter(Health, Armor, Name);
         }
 
-        public virtual bool CanAttack(List<Fighter> enemySoldiers)
+        public virtual bool CanAttack(List<Fighter> enemyFighter, Army enemyArmy)
         {
-            int opponentIndex = UserUtils.GenerateRandomNumber(enemySoldiers.Count);
-            Fighter opponent = enemySoldiers[opponentIndex];
+            int opponentIndex = UserUtils.GenerateRandomNumber(enemyFighter.Count);
+            Fighter opponent = enemyFighter[opponentIndex];
 
             int randomDamageHealth = GenerateRandomDamage();
             int randomArmorPenetration = GenerateRandomDamage();
@@ -301,7 +305,12 @@ namespace Tasks_IJunior_02._06_OOP
             Console.WriteLine($"Состояние противника\nЗдоровье:{opponent.Health}\nБроня:{opponent.Armor}\n");
             Thread.Sleep(2000);
 
-            return opponent.Health <= 0;
+            return IsFighterAlive(opponent);
+        }
+
+        public bool IsFighterAlive(Fighter opponent)
+        {
+            return opponent.Health > 0;
         }
 
         public void TakeDamage(int damageHealth, int armorPenetration)
@@ -319,11 +328,6 @@ namespace Tasks_IJunior_02._06_OOP
             {
                 Armor = minimum;
             }
-        }
-
-        public void RemoveFiter(List<Fighter> enemySoldiers, Fighter opponent)
-        {
-            enemySoldiers.Remove(opponent);
         }
 
         protected virtual int GenerateRandomDamage()
