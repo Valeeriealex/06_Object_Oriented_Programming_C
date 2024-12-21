@@ -9,7 +9,7 @@ namespace Tasks_IJunior_02._06_OOP
         public static void Main(string[] args)
         {
             Battle battle = new Battle();
-            battle.NewBattle();
+            battle.WagingBattle();
         }
     }
 
@@ -18,7 +18,7 @@ namespace Tasks_IJunior_02._06_OOP
         private Army _elvesArmy = new Army("Армия эльфов");
         private Army _orcsArmy = new Army("Армия орков");
 
-        public void NewBattle()
+        public void WagingBattle()
         {
             ShowState();
             Fight();
@@ -49,7 +49,7 @@ namespace Tasks_IJunior_02._06_OOP
 
         private void DetermineWinner()
         {
-            if (!_elvesArmy.HasFighters() && !_orcsArmy.HasFighters())
+            if (_elvesArmy.HasFighters() == false && _orcsArmy.HasFighters() == false)
             {
                 Console.WriteLine("Ничья!");
             }
@@ -72,24 +72,24 @@ namespace Tasks_IJunior_02._06_OOP
 
     public class Army
     {
-        private List<Fighter> _army;
+        private List<Fighter> _fighters;
         private List<Fighter> _fighterTypes;
 
         public Army(string name)
         {
             Name = name;
-            _army = new List<Fighter>();
+            _fighters = new List<Fighter>();
             InitializeFighterTypes();
             FillArmy();
         }
 
         public string Name { get; private set; }
 
-        public List<Fighter> GetFighters() => new List<Fighter>(_army);
+        public List<Fighter> GetFighters() => new List<Fighter>(_fighters);
 
         public void Attack(List<Fighter> fighters)
         {
-            foreach (Fighter fighter in _army)
+            foreach (Fighter fighter in _fighters)
             {
                 Console.WriteLine($"\n{fighter.Name} атакует");
                 Thread.Sleep(2000);
@@ -99,10 +99,10 @@ namespace Tasks_IJunior_02._06_OOP
 
         public void RemoveDead()
         {
-            _army.RemoveAll(fighter => fighter.Health <= 0);
+            _fighters.RemoveAll(fighter => fighter.Health <= 0);
         }
 
-        public bool HasFighters() => _army.Count > 0;
+        public bool HasFighters() => _fighters.Count > 0;
 
         public void FillArmy()
         {
@@ -114,7 +114,7 @@ namespace Tasks_IJunior_02._06_OOP
             {
                 int randomIndex = UserUtils.GenerateRandomNumber(_fighterTypes.Count);
                 Fighter fighter = _fighterTypes[randomIndex].Clone();
-                _army.Add(fighter);
+                _fighters.Add(fighter);
             }
         }
 
