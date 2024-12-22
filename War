@@ -148,13 +148,13 @@ namespace Tasks_IJunior_02._06_OOP
         }
     }
 
-    public class DoubleDamageFighter : Fighter
+    public class MultiplierDamageFighter : Fighter
     {
-        public DoubleDamageFighter() : base(50, 30, "Солдат с множителем урона") { }
-
+        public MultiplierDamageFighter() : base(50, 30, "Солдат с множителем урона") { }
+    
         public override Fighter Clone()
         {
-            return new DoubleDamageFighter();
+            return new MultiplierDamageFighter();
         }
 
         public override void Attack(List<Fighter> enemyFighters)
