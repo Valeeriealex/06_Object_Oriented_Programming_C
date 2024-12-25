@@ -9,7 +9,7 @@ namespace Tasks_IJunior_02._06_OOP
         public static void Main(string[] args)
         {
             Battle battle = new Battle();
-            battle.WagingBattle();
+            battle.CreateBattle();
         }
     }
 
@@ -18,7 +18,7 @@ namespace Tasks_IJunior_02._06_OOP
         private Army _elvesArmy = new Army("Армия эльфов");
         private Army _orcsArmy = new Army("Армия орков");
 
-        public void WagingBattle()
+        public void CreateBattle()
         {
             ShowState();
             Fight();
@@ -38,22 +38,24 @@ namespace Tasks_IJunior_02._06_OOP
 
             while (_elvesArmy.HasFighters() && _orcsArmy.HasFighters())
             {
-                Console.WriteLine($"\nАтакует {_elvesArmy.Name}");
-                Thread.Sleep(2000);
-                _elvesArmy.Attack(_orcsArmy.GetFighters());
-                _orcsArmy.RemoveAllDeadFighters();
+                ShowAttackInformation(_elvesArmy, _orcsArmy);
                 ShowState();
 
                 if (_orcsArmy.HasFighters())
                 {
-                    Console.WriteLine($"\nАтакует {_orcsArmy.Name}");
-                    Thread.Sleep(2000);
-                    _orcsArmy.Attack(_elvesArmy.GetFighters());
-                    _elvesArmy.RemoveAllDeadFighters();
+                    ShowAttackInformation(_orcsArmy, _elvesArmy);
                 }
 
                 ShowState();
             }
+        }
+
+        private void ShowAttackInformation(Army attackingArmy, Army defendingArmy)
+        {
+            Console.WriteLine($"\nАтакует {attackingArmy.Name}");
+            Thread.Sleep(2000);
+            attackingArmy.Attack(defendingArmy.GetFighters());
+            defendingArmy.RemoveAllDeadFighters();
         }
 
         private void DetermineWinner()
@@ -70,7 +72,7 @@ namespace Tasks_IJunior_02._06_OOP
             {
                 Console.WriteLine($"Победила армия орков!");
             }
-        }    
+        }
     }
 
     public class Army
@@ -94,8 +96,6 @@ namespace Tasks_IJunior_02._06_OOP
         {
             foreach (Fighter fighter in _fighters)
             {
-                Console.WriteLine($"\n{fighter.Name} атакует");
-                Thread.Sleep(2000);
                 fighter.Attack(enemyFighters);
             }
         }
@@ -126,7 +126,7 @@ namespace Tasks_IJunior_02._06_OOP
             _fighterTypes = new List<Fighter>
             {
                 new OrdinaryFighter(),
-                new DoubleDamageFighter(),
+                new MultiplierDamageFighter(),
                 new FighterSeveralUniqueOpponents(),
                 new FighterSeveralOpponents()
             };
@@ -151,7 +151,7 @@ namespace Tasks_IJunior_02._06_OOP
     public class MultiplierDamageFighter : Fighter
     {
         public MultiplierDamageFighter() : base(50, 30, "Солдат с множителем урона") { }
-    
+
         public override Fighter Clone()
         {
             return new MultiplierDamageFighter();
@@ -167,10 +167,9 @@ namespace Tasks_IJunior_02._06_OOP
             int randomArmorPenetration = GenerateRandomDamage();
             int totalDamage = damageDealt + randomArmorPenetration;
 
-            opponent.TakeDamage(damageDealt, randomArmorPenetration);
-            Console.WriteLine($"\nНанесен урон {totalDamage}!\n");
-            Console.WriteLine($"Состояние противника\nЗдоровье:{opponent.Health}\nБроня:{opponent.Armor}\n");
+            Console.WriteLine($"\n{this.Name} атакует {opponent.Name} и наносит урон {totalDamage}!\n");
             Thread.Sleep(2000);
+            opponent.TakeDamage(damageDealt, randomArmorPenetration);
         }
     }
 
@@ -205,10 +204,9 @@ namespace Tasks_IJunior_02._06_OOP
                     continue;
 
                 targets.Add(target);
-                target.TakeDamage(randomDamage, randomArmorPenetration);
-                Console.WriteLine($"\nНанесен урон {totalDamage}!\n");
-                Console.WriteLine($"Состояние противника\nЗдоровье:{target.Health}\nБроня:{target.Armor}\n");
+                Console.WriteLine($"\n{this.Name} атакует {target.Name} и наносит урон {totalDamage}!\n");
                 Thread.Sleep(2000);
+                target.TakeDamage(totalDamage, randomArmorPenetration);
             }
         }
     }
@@ -226,90 +224,91 @@ namespace Tasks_IJunior_02._06_OOP
         {
             int randomDamage = GenerateRandomDamage();
             int randomArmorPenetration = GenerateRandomDamage();
+            int totalDamage = randomDamage + randomArmorPenetration;
 
             for (int i = enemyFighters.Count - 1; i >= 0; i--)
             {
-                var target = enemyFighters[i];
-
+                Fighter target = enemyFighters[i];
+                Console.WriteLine($"\n{this.Name} атакует {target.Name} и наносит урон {totalDamage}!\n");
+                Thread.Sleep(2000);
                 target.TakeDamage(randomDamage, randomArmorPenetration);
-                Console.WriteLine($"\nНанесен урон {randomDamage}!\n");
-                Console.WriteLine($"Состояние противника\nЗдоровье:{target.Health}\nБроня:{target.Armor}\n");
-                Thread.Sleep(2000);
             }
         }
     }
-        public class Fighter
+    public class Fighter
+    {
+        public Fighter(int health, int armor, string name)
         {
-            public Fighter(int health, int armor, string name)
-            {
-                Damage = GenerateRandomDamage();
-                Health = health;
-                Armor = armor;
-                Name = name;
-            }
-
-            public int Damage { get; private set; }
-            public int Health { get; protected set; }
-            public int Armor { get; private set; }
-            public string Name { get; private set; }
-
-            public virtual Fighter Clone()
-            {
-                return new Fighter(Health, Armor, Name);
-            }
-
-            public virtual void Attack(List<Fighter> enemyFighter)
-            {
-                int opponentIndex = UserUtils.GenerateRandomNumber(enemyFighter.Count);
-                Fighter opponent = enemyFighter[opponentIndex];
-
-                int randomDamageHealth = GenerateRandomDamage();
-                int randomArmorPenetration = GenerateRandomDamage();
-                int totalDamage = randomDamageHealth + randomArmorPenetration;
-
-                opponent.TakeDamage(randomDamageHealth, randomArmorPenetration);
-                Console.WriteLine($"\nНанесен урон {totalDamage}!\n");
-                Console.WriteLine($"Состояние противника\nЗдоровье:{opponent.Health}\nБроня:{opponent.Armor}\n");
-                Thread.Sleep(2000);
-            }
-
-            public void TakeDamage(int damageHealth, int armorPenetration)
-            {
-                Health -= damageHealth;
-                Armor -= armorPenetration;
-                int minimum = 0;
-
-                if (Health < minimum)
-                {
-                    Health = minimum;
-                }
-
-                if (Armor < minimum)
-                {
-                    Armor = minimum;
-                }
-            }
-
-            protected virtual int GenerateRandomDamage()
-            {
-                int minDamage = 1;
-                int maxDamage = 20;
-                return UserUtils.GenerateRandomNumbers(minDamage, maxDamage + 1);
-            }
+            Damage = GenerateRandomDamage();
+            Health = health;
+            Armor = armor;
+            Name = name;
         }
 
-        public class UserUtils
+        public int Damage { get; private set; }
+        public int Health { get; protected set; }
+        public int Armor { get; private set; }
+        public string Name { get; private set; }
+
+        public virtual Fighter Clone()
         {
-            private static Random s_random = new Random();
+            return new Fighter(Health, Armor, Name);
+        }
 
-            public static int GenerateRandomNumbers(int min, int max)
+        public virtual void Attack(List<Fighter> enemyFighter)
+        {
+            int opponentIndex = UserUtils.GenerateRandomNumber(enemyFighter.Count);
+            Fighter opponent = enemyFighter[opponentIndex];
+
+            int randomDamageHealth = GenerateRandomDamage();
+            int randomArmorPenetration = GenerateRandomDamage();
+            int totalDamage = randomDamageHealth + randomArmorPenetration;
+
+            Console.WriteLine($"\n{this.Name} атакует {opponent.Name} и наносит урон {totalDamage}!\n");
+            Thread.Sleep(2000);
+            opponent.TakeDamage(randomDamageHealth, randomArmorPenetration);
+        }
+
+        public void TakeDamage(int damageHealth, int armorPenetration)
+        {
+            Health -= damageHealth;
+            Armor -= armorPenetration;
+            int minimum = 0;
+
+            if (Health < minimum)
             {
-                return s_random.Next(min, max);
+                Health = minimum;
             }
 
-            public static int GenerateRandomNumber(int number)
+            if (Armor < minimum)
             {
-                return s_random.Next(number);
+                Armor = minimum;
             }
+
+            Console.WriteLine($"\n{this.Name} получил урон!\nСостояние\nЗдоровье: {this.Health}\nБроня: {this.Armor}\n");
+            Thread.Sleep(2000);
+        }
+
+        protected virtual int GenerateRandomDamage()
+        {
+            int minDamage = 1;
+            int maxDamage = 20;
+            return UserUtils.GenerateRandomNumbers(minDamage, maxDamage + 1);
         }
     }
+
+    public class UserUtils
+    {
+        private static Random s_random = new Random();
+
+        public static int GenerateRandomNumbers(int min, int max)
+        {
+            return s_random.Next(min, max);
+        }
+
+        public static int GenerateRandomNumber(int number)
+        {
+            return s_random.Next(number);
+        }
+    }
+}
