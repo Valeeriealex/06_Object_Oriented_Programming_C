@@ -110,7 +110,7 @@ namespace Tasks_IJunior_02._06_OOP
         private void FillArmy()
         {
             int minimumNumberFighters = 3;
-            int maximumNumberFighters = 5;
+            int maximumNumberFighters = 10;
             int numberOfFighters = UserUtils.GenerateRandomNumbers(minimumNumberFighters, maximumNumberFighters);
 
             for (int i = 0; i < numberOfFighters; i++)
@@ -125,36 +125,21 @@ namespace Tasks_IJunior_02._06_OOP
         {
             _fighterTypes = new List<Fighter>
             {
-                new OrdinaryFighter(),
-                new MultiplierDamageFighter(),
-                new FighterSeveralUniqueOpponents(),
-                new FighterSeveralOpponents()
+                new Fighter(100, 10, "Обычный мечник"),
+                new Rider(),
+                new Demolitionist(),
+                new Archer()
             };
         }
     }
 
-    public class OrdinaryFighter : Fighter
+    public class Rider : Fighter
     {
-        public OrdinaryFighter() : base(100, 10, "Обычный солдат без особенностей") { }
+        public Rider() : base(50, 30, "Всадник с множителем урона") { }
 
         public override Fighter Clone()
         {
-            return new OrdinaryFighter();
-        }
-
-        public override void Attack(List<Fighter> enemyFighter)
-        {
-            base.Attack(enemyFighter);
-        }
-    }
-
-    public class MultiplierDamageFighter : Fighter
-    {
-        public MultiplierDamageFighter() : base(50, 30, "Солдат с множителем урона") { }
-
-        public override Fighter Clone()
-        {
-            return new MultiplierDamageFighter();
+            return new Rider();
         }
 
         public override void Attack(List<Fighter> enemyFighters)
@@ -173,13 +158,13 @@ namespace Tasks_IJunior_02._06_OOP
         }
     }
 
-    public class FighterSeveralUniqueOpponents : Fighter
+    public class Demolitionist : Fighter
     {
-        public FighterSeveralUniqueOpponents() : base(70, 40, "Солдат с несколькими уникальными противниками") { }
+        public Demolitionist() : base(30, 80, "Подрывник с уникальными противниками") { }
 
         public override Fighter Clone()
         {
-            return new FighterSeveralUniqueOpponents();
+            return new Demolitionist();
         }
 
         public override void Attack(List<Fighter> enemyFighters)
@@ -187,6 +172,7 @@ namespace Tasks_IJunior_02._06_OOP
             int randomDamage = GenerateRandomDamage();
             int randomArmorPenetration = GenerateRandomDamage();
             int totalDamage = randomDamage + randomArmorPenetration;
+
             int maximumTargets = 3;
             HashSet<Fighter> targets = new HashSet<Fighter>();
 
@@ -211,13 +197,13 @@ namespace Tasks_IJunior_02._06_OOP
         }
     }
 
-    public class FighterSeveralOpponents : Fighter
+    public class Archer : Fighter
     {
-        public FighterSeveralOpponents() : base(90, 20, "Солдат с несколькими противниками") { }
+        public Archer() : base(70, 20, "Лучник с несколькими противниками") { }
 
         public override Fighter Clone()
         {
-            return new FighterSeveralOpponents();
+            return new Rider();
         }
 
         public override void Attack(List<Fighter> enemyFighters)
@@ -226,9 +212,17 @@ namespace Tasks_IJunior_02._06_OOP
             int randomArmorPenetration = GenerateRandomDamage();
             int totalDamage = randomDamage + randomArmorPenetration;
 
-            for (int i = enemyFighters.Count - 1; i >= 0; i--)
+            int maximumTargets = 3;
+
+            if (enemyFighters.Count < maximumTargets)
             {
-                Fighter target = enemyFighters[i];
+                maximumTargets = enemyFighters.Count;
+            }
+
+            for (int i = 0; i < maximumTargets; i++)
+            {
+                int targetIndex = UserUtils.GenerateRandomNumber(enemyFighters.Count);
+                Fighter target = enemyFighters[targetIndex];
                 Console.WriteLine($"\n{this.Name} атакует {target.Name} и наносит урон {totalDamage}!\n");
                 Thread.Sleep(2000);
                 target.TakeDamage(randomDamage, randomArmorPenetration);
