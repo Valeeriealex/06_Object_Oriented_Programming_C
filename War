@@ -36,12 +36,12 @@ namespace Tasks_IJunior_02._06_OOP
             Console.WriteLine("Началось сражение!");
             Thread.Sleep(2000);
 
-            while (_elvesArmy.HasFighters() && _orcsArmy.HasFighters())
+            while (_elvesArmy.HasFighters && _orcsArmy.HasFighters)
             {
                 ShowAttackInformation(_elvesArmy, _orcsArmy);
                 ShowState();
 
-                if (_orcsArmy.HasFighters())
+                if (_orcsArmy.HasFighters)
                 {
                     ShowAttackInformation(_orcsArmy, _elvesArmy);
                 }
@@ -60,11 +60,11 @@ namespace Tasks_IJunior_02._06_OOP
 
         private void DetermineWinner()
         {
-            if (_elvesArmy.HasFighters() == false && _orcsArmy.HasFighters() == false)
+            if (_elvesArmy.HasFighters == false && _orcsArmy.HasFighters == false)
             {
                 Console.WriteLine("Ничья!");
             }
-            else if (_elvesArmy.HasFighters())
+            else if (_elvesArmy.HasFighters)
             {
                 Console.WriteLine($"Победила армия эльфов!");
             }
@@ -77,24 +77,30 @@ namespace Tasks_IJunior_02._06_OOP
 
     public class Army
     {
-        private List<Fighter> _fighters;
         private List<Fighter> _fighterTypes;
 
         public Army(string name)
         {
             Name = name;
-            _fighters = new List<Fighter>();
-            InitializeFighterTypes();
+            _fighterTypes = new List<Fighter>()
+            {
+                new Fighter(100, 10, "Обычный мечник"),
+                new Rider(),
+                new Demolitionist(),
+                new Archer()
+            };
+
             FillArmy();
         }
 
         public string Name { get; private set; }
-
-        public List<Fighter> GetFighters() => new List<Fighter>(_fighters);
+        public List<Fighter> Fighters { get; private set; }
+        public bool HasFighters => Fighters.Count > 0;
+        public List<Fighter> GetFighters() => new List<Fighter>(Fighters);
 
         public void Attack(List<Fighter> enemyFighters)
         {
-            foreach (Fighter fighter in _fighters)
+            foreach (Fighter fighter in Fighters)
             {
                 fighter.Attack(enemyFighters);
             }
@@ -102,10 +108,9 @@ namespace Tasks_IJunior_02._06_OOP
 
         public void RemoveAllDeadFighters()
         {
-            _fighters.RemoveAll(fighter => fighter.Health <= 0);
+            int minimumHealth = 0;
+            Fighters.RemoveAll(fighter => fighter.Health <= minimumHealth);
         }
-
-        public bool HasFighters() => _fighters.Count > 0;
 
         private void FillArmy()
         {
@@ -113,23 +118,14 @@ namespace Tasks_IJunior_02._06_OOP
             int maximumNumberFighters = 10;
             int numberOfFighters = UserUtils.GenerateRandomNumbers(minimumNumberFighters, maximumNumberFighters);
 
+            Fighters = new List<Fighter>();
+
             for (int i = 0; i < numberOfFighters; i++)
             {
                 int randomIndex = UserUtils.GenerateRandomNumber(_fighterTypes.Count);
                 Fighter fighter = _fighterTypes[randomIndex].Clone();
-                _fighters.Add(fighter);
+                Fighters.Add(fighter);
             }
-        }
-
-        private void InitializeFighterTypes()
-        {
-            _fighterTypes = new List<Fighter>
-            {
-                new Fighter(100, 10, "Обычный мечник"),
-                new Rider(),
-                new Demolitionist(),
-                new Archer()
-            };
         }
     }
 
@@ -174,7 +170,7 @@ namespace Tasks_IJunior_02._06_OOP
             int totalDamage = randomDamage + randomArmorPenetration;
 
             int maximumTargets = 3;
-            HashSet<Fighter> targets = new HashSet<Fighter>();
+            HashSet<Fighter> targets = new HashSet<Fighter>(enemyFighters);
 
             if (enemyFighters.Count < maximumTargets)
             {
@@ -186,13 +182,10 @@ namespace Tasks_IJunior_02._06_OOP
                 int targetIndex = UserUtils.GenerateRandomNumber(enemyFighters.Count);
                 Fighter target = enemyFighters[targetIndex];
 
-                if (targets.Contains(target))
-                    continue;
-
-                targets.Add(target);
                 Console.WriteLine($"\n{this.Name} атакует {target.Name} и наносит урон {totalDamage}!\n");
                 Thread.Sleep(2000);
                 target.TakeDamage(totalDamage, randomArmorPenetration);
+                targets.Remove(target);
             }
         }
     }
@@ -229,6 +222,7 @@ namespace Tasks_IJunior_02._06_OOP
             }
         }
     }
+
     public class Fighter
     {
         public Fighter(int health, int armor, string name)
