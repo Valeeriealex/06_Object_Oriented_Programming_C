@@ -9,20 +9,52 @@ namespace Tasks_IJunior_02._06_OOP
         public static void Main(string[] args)
         {
             Battle battle = new Battle();
-            battle.CreateBattle();
+            battle.Create();
         }
     }
 
     public class Battle
     {
-        private Army _elvesArmy = new Army("Армия эльфов");
-        private Army _orcsArmy = new Army("Армия орков");
+        private Army _elvesArmy;
+        private Army _orcsArmy;
 
-        public void CreateBattle()
+        public void Create()
         {
+            List<Fighter> fightersElves = CreateFighters();
+            List<Fighter> fightersOrcs = CreateFighters();
+
+            _elvesArmy = new Army("Армия эльфов", fightersElves);
+            _orcsArmy = new Army("Армия орков", fightersOrcs);
+
             ShowState();
             Fight();
             DetermineWinner();
+        }
+
+        private List<Fighter> CreateFighters()
+        {
+            List<Fighter> fightersTypes = new List<Fighter>
+            {
+            new Fighter(100, 10, "Обычный мечник"),
+            new Rider(),
+            new Demolitionist(),
+            new Archer()
+            };
+
+            int minimumNumberFighters = 3;
+            int maximumNumberFighters = 10;
+            int numberOfFighters = UserUtils.GenerateRandomNumbers(minimumNumberFighters, maximumNumberFighters);
+
+            List<Fighter> fighters = new List<Fighter>();
+
+            for (int i = 0; i < numberOfFighters; i++)
+            {
+                    int randomIndex = UserUtils.GenerateRandomNumber(fightersTypes.Count);
+                    Fighter fighter = fightersTypes[randomIndex].Clone();
+                    fighters.Add(fighter);
+            }
+
+            return fighters;
         }
 
         private void ShowState()
@@ -77,30 +109,21 @@ namespace Tasks_IJunior_02._06_OOP
 
     public class Army
     {
-        private List<Fighter> _fighterTypes;
+        private List<Fighter> _fighters;
 
-        public Army(string name)
+        public Army(string name, List<Fighter> fighters)
         {
             Name = name;
-            _fighterTypes = new List<Fighter>()
-            {
-                new Fighter(100, 10, "Обычный мечник"),
-                new Rider(),
-                new Demolitionist(),
-                new Archer()
-            };
-
-            FillArmy();
+            _fighters = fighters;
         }
 
         public string Name { get; private set; }
-        public List<Fighter> Fighters { get; private set; }
-        public bool HasFighters => Fighters.Count > 0;
-        public List<Fighter> GetFighters() => new List<Fighter>(Fighters);
+        public List<Fighter> GetFighters() => new List<Fighter>(_fighters);
+        public bool HasFighters => GetFighters().Count > 0;
 
         public void Attack(List<Fighter> enemyFighters)
         {
-            foreach (Fighter fighter in Fighters)
+            foreach (Fighter fighter in _fighters)
             {
                 fighter.Attack(enemyFighters);
             }
@@ -109,23 +132,7 @@ namespace Tasks_IJunior_02._06_OOP
         public void RemoveAllDeadFighters()
         {
             int minimumHealth = 0;
-            Fighters.RemoveAll(fighter => fighter.Health <= minimumHealth);
-        }
-
-        private void FillArmy()
-        {
-            int minimumNumberFighters = 3;
-            int maximumNumberFighters = 10;
-            int numberOfFighters = UserUtils.GenerateRandomNumbers(minimumNumberFighters, maximumNumberFighters);
-
-            Fighters = new List<Fighter>();
-
-            for (int i = 0; i < numberOfFighters; i++)
-            {
-                int randomIndex = UserUtils.GenerateRandomNumber(_fighterTypes.Count);
-                Fighter fighter = _fighterTypes[randomIndex].Clone();
-                Fighters.Add(fighter);
-            }
+            _fighters.RemoveAll(fighter => fighter.Health <= minimumHealth);
         }
     }
 
