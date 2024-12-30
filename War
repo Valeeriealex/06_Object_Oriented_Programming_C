@@ -59,8 +59,8 @@ namespace Tasks_IJunior_02._06_OOP
 
         private void ShowState()
         {
-            Console.WriteLine($"\nКоличество бойцов эльфов: {_elvesArmy.GetFighters().Count}");
-            Console.WriteLine($"Количество бойцов орков: {_orcsArmy.GetFighters().Count}\n");
+            Console.WriteLine($"\nКоличество бойцов эльфов: {_elvesArmy.GetFighters.Count}");
+            Console.WriteLine($"Количество бойцов орков: {_orcsArmy.GetFighters.Count}\n");
         }
 
         private void Fight()
@@ -86,7 +86,7 @@ namespace Tasks_IJunior_02._06_OOP
         {
             Console.WriteLine($"\nАтакует {attackingArmy.Name}");
             Thread.Sleep(2000);
-            attackingArmy.Attack(defendingArmy.GetFighters());
+            attackingArmy.Attack(defendingArmy.GetFighters);
             defendingArmy.RemoveAllDeadFighters();
         }
 
@@ -118,8 +118,8 @@ namespace Tasks_IJunior_02._06_OOP
         }
 
         public string Name { get; private set; }
-        public List<Fighter> GetFighters() => new List<Fighter>(_fighters);
-        public bool HasFighters => GetFighters().Count > 0;
+        public List<Fighter> GetFighters => new List<Fighter>(_fighters);
+        public bool HasFighters => _fighters.Count > 0;
 
         public void Attack(List<Fighter> enemyFighters)
         {
