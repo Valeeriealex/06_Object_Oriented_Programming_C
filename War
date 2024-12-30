@@ -118,7 +118,7 @@ namespace Tasks_IJunior_02._06_OOP
         }
 
         public string Name { get; private set; }
-        public List<Fighter> GetFighters => new List<Fighter>(_fighters);
+        public List<Fighter> Fighters => new List<Fighter>(_fighters);
         public bool HasFighters => _fighters.Count > 0;
 
         public void Attack(List<Fighter> enemyFighters)
