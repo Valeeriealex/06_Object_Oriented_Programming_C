@@ -82,7 +82,12 @@ namespace Tasks_IJunior_02._06_OOP
             Console.WriteLine("Введите название рыбки: ");
             string nameFish = Console.ReadLine();
             Console.WriteLine("Укажите возраст рыбки: ");
-            int ageFish = Convert.ToInt32(Console.ReadLine());
+            int ageFish;
+
+            while (!int.TryParse(Console.ReadLine(), out ageFish) || ageFish < 0 && ageFish > 10)
+            {
+                Console.WriteLine("Ошибка: Введите корректный возраст рыбки");
+            }
 
             if (_fishs.Count < _maximumFish)
             {
