@@ -15,10 +15,6 @@ namespace Tasks_IJunior_02._06_OOP
     public class AquariumFish
     {
         private List<Fish> _fishs;
-        private int _maximumFish = 10;
-        private const int AgeIncrement = 1;
-        private const int MaxAge = 10;
-        private bool _isAlive = true;
 
         public AquariumFish()
         {
@@ -27,31 +23,32 @@ namespace Tasks_IJunior_02._06_OOP
 
         public void Create()
         {
-            createStartStateAquarium();
+            CreateStartStateAquarium();
+            bool isAlive = true;
 
-            while (_isAlive)
+            while (isAlive)
             {
-                const string MenuAddFish = "1";
-                const string MenuTakeFish = "2";
-                const string MenuExit = "3";
+                const string CommandAddFish = "1";
+                const string CommandTakeFish = "2";
+                const string CommandExit = "3";
 
-                printFishes();
+                PrintFishes();
 
-                Console.WriteLine($"{MenuAddFish} - Добавить рыбку {MenuTakeFish} - Вытащить рыбку {MenuExit} - Выйти");
+                Console.WriteLine($"{CommandAddFish} - Добавить рыбку {CommandTakeFish} - Вытащить рыбку {CommandExit} - Выйти");
                 string userChose = Console.ReadLine();
 
                 switch (userChose)
                 {
-                    case MenuAddFish:
-                        addFish();
+                    case CommandAddFish:
+                        AddFish();
                         break;
 
-                    case MenuTakeFish:
-                        takeFish();
+                    case CommandTakeFish:
+                        TakeFish();
                         break;
 
-                    case MenuExit:
-                        _isAlive = false;
+                    case CommandExit:
+                        isAlive = false;
                         break;
 
                     default:
@@ -59,26 +56,31 @@ namespace Tasks_IJunior_02._06_OOP
                         break;
                 }
 
-                ageFish();
+                MakeFishOld();
             }
         }
 
-        private void ageFish()
+        private void MakeFishOld()
         {
+            int maxAge = 10;
+            int ageIncrement = 1;
+
             for (int i = _fishs.Count - 1; i >= 0; i--)
             {
-                _fishs[i].TakeAge(AgeIncrement);
+                _fishs[i].IncreaseAge(ageIncrement);
 
-                if (_fishs[i].Age > MaxAge)
+                if (_fishs[i].Age > maxAge)
                 {
-                    Console.WriteLine($"Рыбка {_fishs[i].Type} умерла");
+                    Console.WriteLine($"\nРыбка {_fishs[i].Type} умерла");
                     _fishs.RemoveAt(i);
                 }
             }
         }
 
-        private void addFish()
+        private void AddFish()
         {
+            int maximumFish = 10;
+
             Console.WriteLine("Введите название рыбки: ");
             string nameFish = Console.ReadLine();
             Console.WriteLine("Укажите возраст рыбки: ");
@@ -89,7 +91,7 @@ namespace Tasks_IJunior_02._06_OOP
                 Console.WriteLine("Ошибка: Введите корректный возраст рыбки");
             }
 
-            if (_fishs.Count < _maximumFish)
+            if (_fishs.Count < maximumFish)
             {
                 _fishs.Add(new Fish(nameFish, ageFish));
             }
@@ -99,7 +101,7 @@ namespace Tasks_IJunior_02._06_OOP
             }
         }
 
-        private void takeFish()
+        private void TakeFish()
         {
             Console.WriteLine("Введите номер рыбки: ");
             string input = Console.ReadLine();
@@ -111,7 +113,7 @@ namespace Tasks_IJunior_02._06_OOP
                 if (indexToRemove >= 0 && indexToRemove < _fishs.Count)
                 {
                     _fishs.RemoveAt(indexToRemove);
-                    Console.WriteLine("Рыбка была удалена из аквариума");
+                    Console.WriteLine("Вы убрали рыбку из аквариума");
                 }
                 else
                 {
@@ -124,7 +126,7 @@ namespace Tasks_IJunior_02._06_OOP
             }
         }
 
-        private void printFishes()
+        private void PrintFishes()
         {
             Console.WriteLine("Рыбки в аквариуме: ");
 
@@ -141,7 +143,7 @@ namespace Tasks_IJunior_02._06_OOP
             }
         }
 
-        private void createStartStateAquarium()
+        private void CreateStartStateAquarium()
         {
             _fishs.Add(new Fish("Золотая рыбка", 3));
             _fishs.Add(new Fish("Скалярия", 4));
@@ -166,7 +168,7 @@ namespace Tasks_IJunior_02._06_OOP
             Console.WriteLine($"Вид: {Type}, Возраст: {Age}");
         }
 
-        public void TakeAge(int ageIncrement)
+        public void IncreaseAge(int ageIncrement)
         {
             Age += ageIncrement;
         }
