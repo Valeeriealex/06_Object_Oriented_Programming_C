@@ -20,13 +20,40 @@ namespace Tasks_IJunior_02._06_OOP
         {
             _aviaries = new List<Aviary>
             {
-                new AviaryCats(),
-                new AviaryReptiles(),
-                new AviaryBirds(),
-                new AviaryHerbivores(),
-                new AviaryPredator()
+                new Aviary("Вольер со львами", new List<Animal>
+                {
+                    new Animal("лев Симба", "мужского пола", "рычит"),
+                    new Animal("львица Нала", "женского пола", "мурчит"),
+                    new Animal("львенок Муфаса", "мужского пола", "урчит")
+                }),
+                new Aviary("Вольер с пандами", new List<Animal>
+                {
+                    new Animal("панда По", "мужского пола", "жует бамбук"),
+                }),
+                new Aviary("Вольер с утками", new List<Animal>
+                {
+                    new Animal("селезень", "мужского пола", "кря-кря"),
+                    new Animal("утка", "женского пола", "кря-кря-кря"),
+                    new Animal("утенок", "женского пола", "кря-кря-кря-кря-кря-кря...")
+                }),
+                new Aviary("Вольер с оленями", new List<Animal>
+                {
+                    new Animal("олень Бэмби", "мужского пола", "бодается"),
+                    new Animal("олениха Фэлин", "женского пола", "ревет"),
+                }),
+
+                new Aviary("Вольер со змеями", new List<Animal>
+                {
+                    new Animal("змей Снэг", "мужского пола", "ползет"),
+                    new Animal("змея Орочимару", "женского пола", "шипит"),
+                }),
+
+                new Aviary("Вольер с лисами", new List<Animal>
+                {
+                    new Animal("лис Курама", "мужского пола", "фыр-фыр"),
+                }),
             };
-        }
+        }        
 
         public void Create()
         {
@@ -41,7 +68,7 @@ namespace Tasks_IJunior_02._06_OOP
                     Console.WriteLine($"{i + 1} {_aviaries[i].Name}");
                 }
 
-                Console.WriteLine($"{_aviaries.Count + 1}\nПокинуть зоопарк\n");
+                Console.WriteLine($"{_aviaries.Count + 1} Покинуть зоопарк\n");
 
                 string userChose = Console.ReadLine();
 
@@ -65,128 +92,17 @@ namespace Tasks_IJunior_02._06_OOP
         }
     }
 
-    public class AviaryCats : Aviary
+    public class Aviary
     {
-        public AviaryCats() : base("\nВольер с кошачьими\n") 
-        {
-            FillWithDefaultAnimals();
-        }
-
-        public override void ShowAviaryInfo()
-        {
-            Console.WriteLine($"\n{Name}");
-            Console.WriteLine($"Количество кошек: {AnimalCount}\n");
-            ShowAnimalInfo();
-        }
-        
-        protected override void FillWithDefaultAnimals()
-        {
-            AddAnimal(new Animal("лев Лева", "мужского пола", "рычит"));
-            AddAnimal(new Animal("пантера Багира", "женского пола", "мурчит"));
-            AddAnimal(new Animal("тигр Полосатик", "мужского пола", "урчит"));
-        }
-    }
-
-    public class AviaryReptiles : Aviary
-    {
-        public AviaryReptiles() : base("\nВольер с рептилиями\n") 
-        {
-            FillWithDefaultAnimals();
-        }
-
-        public override void ShowAviaryInfo()
-        {
-            Console.WriteLine($"\n{Name}");
-            Console.WriteLine($"Количество рептилий: {AnimalCount}\n");
-            ShowAnimalInfo();
-        }
-
-        protected override void FillWithDefaultAnimals()
-        {
-            AddAnimal(new Animal("крокодил Гена", "мужского пола", "открывает пасть"));
-            AddAnimal(new Animal("ящерица Яр", "мужского пола", "ползает"));
-            AddAnimal(new Animal("змея Снэг", "женского пола", "шипит"));
-        }
-    }
-
-    public class AviaryBirds : Aviary
-    {
-        public AviaryBirds() : base("\nВольер с птицами\n") 
-        {
-            FillWithDefaultAnimals();
-        }
-
-        public override void ShowAviaryInfo()
-        {
-            Console.WriteLine($"\n{Name}");
-            Console.WriteLine($"Количество птиц: {AnimalCount}\n");
-            ShowAnimalInfo();
-        }
-
-        protected override void FillWithDefaultAnimals()
-        {
-            AddAnimal(new Animal("попугай Кеша", "мужского пола", "всех приветствует"));
-            AddAnimal(new Animal("тукан Жако", "женского пола", "тук-тук"));
-            AddAnimal(new Animal("павлин Арджун", "мужского пола", "раскрывает хвост"));
-        }
-    }
-
-    public class AviaryHerbivores : Aviary
-    {
-        public AviaryHerbivores() : base("\nВольер с травоядными\n") 
-        {
-            FillWithDefaultAnimals();
-        }
-
-        public override void ShowAviaryInfo()
-        {
-            Console.WriteLine($"\n{Name}");
-            Console.WriteLine($"Количество животных: {AnimalCount}\n");
-            ShowAnimalInfo();
-        }
-
-        protected override void FillWithDefaultAnimals()
-        {
-            AddAnimal(new Animal("жираф Стив", "мужского пола", "жует листья"));
-            AddAnimal(new Animal("слон Мэни", "женского пола", "трубит"));
-            AddAnimal(new Animal("олень Бэмби", "мужского пола", "ревет"));
-        }
-    }
-
-    public class AviaryPredator : Aviary
-    {
-        public AviaryPredator() : base("\nВольер с хищниками\n") 
-        {
-            FillWithDefaultAnimals();
-        }
-
-        public override void ShowAviaryInfo()
-        {
-            Console.WriteLine($"\n{Name}");
-            Console.WriteLine($"Количество хищников: {AnimalCount}\n");
-            ShowAnimalInfo();
-        }
-
-        protected override void FillWithDefaultAnimals()
-        {
-            AddAnimal(new Animal("медведь Миша", "мужского пола", "сопит"));
-            AddAnimal(new Animal("волк Альфа", "мужского пола", "воет"));
-            AddAnimal(new Animal("лиса Курама", "женского пола", "фырчит"));
-        }
-    }
-
-    public abstract class Aviary
-    {
-        private string _name;
         private List<Animal> _animals;
 
-        public Aviary(string name)
+        public Aviary(string name, List<Animal> animals)
         {
-            this._name = name;
-            this._animals = new List<Animal>();
+            Name = name;
+            _animals = animals;
         }
 
-        public string Name => _name;
+        public string Name { get; }
         public int AnimalCount => _animals.Count;
 
         public void ShowAnimalInfo()
@@ -197,8 +113,12 @@ namespace Tasks_IJunior_02._06_OOP
             }
         }
 
-        public abstract void ShowAviaryInfo();
-        protected abstract void FillWithDefaultAnimals();
+        public void ShowAviaryInfo()
+        {
+            Console.WriteLine($"\n{Name}");
+            Console.WriteLine($"Количество животных: {AnimalCount}\n");
+            ShowAnimalInfo();
+        }
 
         protected void AddAnimal(Animal animal)
         {
@@ -215,9 +135,9 @@ namespace Tasks_IJunior_02._06_OOP
             Sound = sound;
         }
 
-        public string Type { get; set; }
-        public string Sex { get; set; }
-        public string Sound { get; set; }
+        public string Type { get; }
+        public string Sex { get; }
+        public string Sound { get; }
 
         public void ShowAnimalInfo()
         {
