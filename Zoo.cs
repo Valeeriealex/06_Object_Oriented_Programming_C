@@ -8,7 +8,7 @@ namespace Tasks_IJunior_02._06_OOP
         public static void Main(string[] args)
         {
             ZooPark zooPark = new ZooPark();
-            zooPark.Create();
+            zooPark.Work();
         }
     }
 
@@ -18,44 +18,74 @@ namespace Tasks_IJunior_02._06_OOP
 
         public ZooPark()
         {
-            _aviaries = new List<Aviary>
+            List<Animal> animals = new List<Animal>
             {
-                new Aviary("Вольер со львами", new List<Animal>
-                {
-                    new Animal("лев Симба", "мужского пола", "рычит"),
-                    new Animal("львица Нала", "женского пола", "мурчит"),
-                    new Animal("львенок Муфаса", "мужского пола", "урчит")
-                }),
-                new Aviary("Вольер с пандами", new List<Animal>
-                {
-                    new Animal("панда По", "мужского пола", "жует бамбук"),
-                }),
-                new Aviary("Вольер с утками", new List<Animal>
-                {
-                    new Animal("селезень", "мужского пола", "кря-кря"),
-                    new Animal("утка", "женского пола", "кря-кря-кря"),
-                    new Animal("утенок", "женского пола", "кря-кря-кря-кря-кря-кря...")
-                }),
-                new Aviary("Вольер с оленями", new List<Animal>
-                {
-                    new Animal("олень Бэмби", "мужского пола", "бодается"),
-                    new Animal("олениха Фэлин", "женского пола", "ревет"),
-                }),
-
-                new Aviary("Вольер со змеями", new List<Animal>
-                {
-                    new Animal("змей Снэг", "мужского пола", "ползет"),
-                    new Animal("змея Орочимару", "женского пола", "шипит"),
-                }),
-
-                new Aviary("Вольер с лисами", new List<Animal>
-                {
-                    new Animal("лис Курама", "мужского пола", "фыр-фыр"),
-                }),
+                new Animal("лев Симба", "мужского пола", "рычит"),
+                new Animal("львица Нала", "женского пола", "мурчит"),
+                new Animal("львенок Муфаса", "мужского пола", "урчит"),
+                new Animal("панда По", "мужского пола", "жует бамбук"),
+                new Animal("селезень", "мужского пола", "кря-кря"),
+                new Animal("утка", "женского пола", "кря-кря-кря"),
+                new Animal("утенок", "женского пола", "кря-кря-кря-кря-кря-кря..."),
+                new Animal("олень Бэмби", "мужского пола", "бодается"),
+                new Animal("олениха Фэлин", "женского пола", "ревет"),
+                new Animal("змей Снэг", "мужского пола", "ползет"),
+                new Animal("змея Орочимару", "женского пола", "шипит"),
+                new Animal("лис Курама", "мужского пола", "фыр-фыр"),
             };
-        }        
 
-        public void Create()
+            _aviaries = CreateAviaries(animals);
+        }
+
+        private List<Aviary> CreateAviaries(List<Animal> animals)
+        {
+            List<Animal> lionAviary = new List<Animal>();
+            List<Animal> pandaAviary = new List<Animal>();
+            List<Animal> duckAviary = new List<Animal>();
+            List<Animal> deerAviary = new List<Animal>();
+            List<Animal> snakeAviary = new List<Animal>();
+            List<Animal> foxAviary = new List<Animal>();
+
+            foreach (Animal animal in animals)
+            {
+                if (animal.Type.StartsWith("лев") || animal.Type.StartsWith("львица") || animal.Type.StartsWith("львенок"))
+                {
+                    lionAviary.Add(animal);
+                }
+                else if (animal.Type.StartsWith("панда"))
+                {
+                    pandaAviary.Add(animal);
+                }
+                else if (animal.Type.StartsWith("утка") || animal.Type.StartsWith("селезень") || animal.Type.StartsWith("утенок"))
+                {
+                    duckAviary.Add(animal);
+                }
+                else if (animal.Type.StartsWith("олень") || animal.Type.StartsWith("олениха") || animal.Type.StartsWith("олененок"))
+                {
+                    deerAviary.Add(animal);
+                }
+                else if (animal.Type.StartsWith("змей") || animal.Type.StartsWith("змея"))
+                {
+                    snakeAviary.Add(animal);
+                }
+                else if (animal.Type.StartsWith("лис") || animal.Type.StartsWith("лисица") || animal.Type.StartsWith(""))
+                {
+                    foxAviary.Add(animal);
+                }
+            }
+
+            return new List<Aviary>
+    {
+        new Aviary("Вольер со львами", lionAviary),
+        new Aviary("Вольер с пандами", pandaAviary),
+        new Aviary("Вольер с утками", duckAviary),
+        new Aviary("Вольер с оленями", deerAviary),
+        new Aviary("Вольер со змеями", snakeAviary),
+        new Aviary("Вольер с лисами", foxAviary),
+    };
+        }
+
+        public void Work()
         {
             bool isInside = true;
 
@@ -141,7 +171,7 @@ namespace Tasks_IJunior_02._06_OOP
 
         public void ShowAnimalInfo()
         {
-                Console.WriteLine($"Вид: {Type}, Пол: {Sex}, Звук: {Sound}");
+            Console.WriteLine($"Вид: {Type}, Пол: {Sex}, Звук: {Sound}");
         }
     }
 }
