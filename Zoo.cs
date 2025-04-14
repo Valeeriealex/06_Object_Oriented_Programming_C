@@ -39,6 +39,16 @@ namespace Tasks_IJunior_02._06_OOP
 
         private List<Aviary> CreateAviaries(List<Animal> animals)
         {
+            Dictionary<string, List<string>> animalTypes = new Dictionary<string, List<string>>
+            {
+                { "лев", new List<string> { "лев Симба", "львица Нала", "львенок Муфаса" } },
+                { "панда", new List<string> { "панда По" } },
+                { "утка", new List<string> { "утка", "селезень", "утенок" } },
+                { "олень", new List<string> { "олень Бэмби", "олениха Фэлин" } },
+                { "змей", new List<string> { "змей Снэг", "змея Орочимару" } },
+                { "лис", new List<string> { "лис Курама" } }
+            };
+
             List<Animal> lionAviary = new List<Animal>();
             List<Animal> pandaAviary = new List<Animal>();
             List<Animal> duckAviary = new List<Animal>();
@@ -46,43 +56,69 @@ namespace Tasks_IJunior_02._06_OOP
             List<Animal> snakeAviary = new List<Animal>();
             List<Animal> foxAviary = new List<Animal>();
 
-            foreach (Animal animal in animals)
+            foreach (var beast in animalTypes)
             {
-                if (animal.Type.StartsWith("лев") || animal.Type.StartsWith("львица") || animal.Type.StartsWith("львенок"))
+                string type = beast.Key;
+                List<string> names = beast.Value;
+
+                foreach (var name in names)
                 {
-                    lionAviary.Add(animal);
-                }
-                else if (animal.Type.StartsWith("панда"))
-                {
-                    pandaAviary.Add(animal);
-                }
-                else if (animal.Type.StartsWith("утка") || animal.Type.StartsWith("селезень") || animal.Type.StartsWith("утенок"))
-                {
-                    duckAviary.Add(animal);
-                }
-                else if (animal.Type.StartsWith("олень") || animal.Type.StartsWith("олениха") || animal.Type.StartsWith("олененок"))
-                {
-                    deerAviary.Add(animal);
-                }
-                else if (animal.Type.StartsWith("змей") || animal.Type.StartsWith("змея"))
-                {
-                    snakeAviary.Add(animal);
-                }
-                else if (animal.Type.StartsWith("лис") || animal.Type.StartsWith("лисица") || animal.Type.StartsWith(""))
-                {
-                    foxAviary.Add(animal);
+                    string sex = name.Contains("мужского пола") ? "мужского пола" : "женского пола";
+                    string sound = GetAnimalSound(name);
+
+                    Animal animal = new Animal(name, sex, sound);
+
+                    switch (type)
+                    {
+                        case "лев":
+                            lionAviary.Add(animal);
+                            break;
+                        case "панда":
+                            pandaAviary.Add(animal);
+                            break;
+                        case "утка":
+                            duckAviary.Add(animal);
+                            break;
+                        case "олень":
+                            deerAviary.Add(animal);
+                            break;
+                        case "змей":
+                            snakeAviary.Add(animal);
+                            break;
+                        case "лис":
+                            foxAviary.Add(animal);
+                            break;
+                    }
                 }
             }
 
             return new List<Aviary>
-    {
-        new Aviary("Вольер со львами", lionAviary),
-        new Aviary("Вольер с пандами", pandaAviary),
-        new Aviary("Вольер с утками", duckAviary),
-        new Aviary("Вольер с оленями", deerAviary),
-        new Aviary("Вольер со змеями", snakeAviary),
-        new Aviary("Вольер с лисами", foxAviary),
-    };
+            {
+                new Aviary("Вольер со львами", lionAviary),
+                new Aviary("Вольер с пандами", pandaAviary),
+                new Aviary("Вольер с утками", duckAviary),
+                new Aviary("Вольер с оленями", deerAviary),
+                new Aviary("Вольер со змеями", snakeAviary),
+                new Aviary("Вольер с лисами", foxAviary),
+            };
+        }
+
+        private string GetAnimalSound(string name)
+        {
+            if (name.Contains("лев") || name.Contains("львица") || name.Contains("львенок"))
+                return "рычит";
+            if (name.Contains("панда"))
+                return "жует бамбук";
+            if (name.Contains("утка") || name.Contains("селезень") || name.Contains("утенок"))
+                return "кря-кря";
+            if (name.Contains("олень") || name.Contains("олениха"))
+                return "бодается";
+            if (name.Contains("змей") || name.Contains("змея"))
+                return "шипит";
+            if (name.Contains("лис"))
+                return "фыр-фыр";
+
+            return "неизвестный звук";
         }
 
         public void Work()
@@ -139,7 +175,7 @@ namespace Tasks_IJunior_02._06_OOP
         {
             foreach (Animal animal in _animals)
             {
-                animal.ShowAnimalInfo();
+                animal.ShowlInfo();
             }
         }
 
@@ -169,7 +205,7 @@ namespace Tasks_IJunior_02._06_OOP
         public string Sex { get; }
         public string Sound { get; }
 
-        public void ShowAnimalInfo()
+        public void ShowlInfo()
         {
             Console.WriteLine($"Вид: {Type}, Пол: {Sex}, Звук: {Sound}");
         }
